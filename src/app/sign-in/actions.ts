@@ -38,8 +38,25 @@ export async function sendSignInLink(_prev: SignInState, formData: FormData): Pr
         message: "HQ can't email this address yet. Ask Ray to finish the email setup, then try again.",
       };
     }
-    if (error.status === 429 || text.includes("rate limit") || text.includes("security purposes")) {
-      return { status: "error", email, message: "Too many links requested. Wait a minute and try again." };
+    // Hourly cap on sign-in emails (Supabase's built-in sender allows very few per hour).
+    if (error.code === "over_email_send_rate_limit" || text.includes("email rate limit")) {
+      return {
+        status: "error",
+        email,
+        message:
+          "HQ has sent its limit of sign-in emails for this hour. Use the last link you received, or try again in an hour.",
+      };
+    }
+    // Per-address wait between two requests, usually under a minute.
+    const wait = text.match(/after (\d+) seconds?/);
+    if (wait || error.status === 429 || text.includes("security purposes")) {
+      return {
+        status: "error",
+        email,
+        message: wait
+          ? `A link was just sent. You can ask for another in ${wait[1]} seconds.`
+          : "Too many requests. Wait a few minutes and try again.",
+      };
     }
     return { status: "error", email, message: "We couldn't send the link. Try again in a moment." };
   }
