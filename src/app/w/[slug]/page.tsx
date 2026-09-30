@@ -122,7 +122,7 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
                   {a.summary}
                   {a.via === "claude" && <span className="ml-2 text-xs text-muted">through Claude</span>}
                 </span>
-                <span className="text-sm text-faint tabular-nums">{formatWhen(a.created_at)}</span>
+                <span className="text-sm text-faint">{formatWhen(a.created_at)}</span>
               </li>
             ))}
           </ul>

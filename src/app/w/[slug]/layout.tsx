@@ -4,6 +4,8 @@ import { getMyWorkspaces, getViewer, getWorkspace, ROLE_LABEL } from "@/lib/hq";
 import { MODULES } from "@/lib/modules";
 import { NavLink } from "./nav-link";
 
+const shortDate = (lands: string) => lands.replace("Friday ", "").replace(/(\d+) (\w{3})\w*/, "$1 $2");
+
 export default async function WorkspaceLayout({ children, params }: LayoutProps<"/w/[slug]">) {
   const { slug } = await params;
   const [viewer, workspace, all] = await Promise.all([getViewer(), getWorkspace(slug), getMyWorkspaces()]);
@@ -15,7 +17,7 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
       <div>
         <NavLink href={base} exact>Overview</NavLink>
         {MODULES.map((m) => (
-          <NavLink key={m.key} href={`${base}/${m.key}`} note={m.ready ? undefined : m.lands.replace("Friday ", "")}>
+          <NavLink key={m.key} href={`${base}/${m.key}`} note={m.ready ? undefined : shortDate(m.lands)}>
             {m.label}
           </NavLink>
         ))}
@@ -58,14 +60,16 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[256px_1fr]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex sticky top-0 h-screen flex-col gap-6 bg-ink px-4 py-6 overflow-y-auto">
-        <Link href={base} className="px-3">
-          <Wordmark tone="paper" />
-        </Link>
-        {switcher}
-        <div className="flex-1">{nav}</div>
-        {footer}
-      </aside>
+      <div className="hidden lg:block bg-ink">
+        <aside className="sticky top-0 flex h-screen flex-col gap-6 px-4 py-6 overflow-y-auto">
+          <Link href={base} className="px-3">
+            <Wordmark tone="paper" />
+          </Link>
+          {switcher}
+          <div className="flex-1">{nav}</div>
+          {footer}
+        </aside>
+      </div>
 
       {/* Phone and tablet */}
       <details className="lg:hidden group bg-ink text-paper">

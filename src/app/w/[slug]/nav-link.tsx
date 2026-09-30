@@ -21,6 +21,7 @@ export function NavLink({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
+      onClick={(e) => e.currentTarget.closest("details")?.removeAttribute("open")}
       className={`flex items-center justify-between rounded-md px-3 h-9 text-[15px] transition-colors ${
         active ? "bg-paper text-ink font-medium" : "text-paper/80 hover:text-paper hover:bg-paper/10"
       }`}

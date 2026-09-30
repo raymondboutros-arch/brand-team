@@ -49,7 +49,7 @@ export default async function ActivityPage({ params }: PageProps<"/w/[slug]/acti
                 <tr key={r.id}>
                   <td className="px-5 py-3">{r.summary}</td>
                   <td className="px-5 py-3 text-muted">{who}</td>
-                  <td className="px-5 py-3 text-muted whitespace-nowrap tabular-nums">{formatWhen(r.created_at)}</td>
+                  <td className="px-5 py-3 text-muted whitespace-nowrap">{formatWhen(r.created_at)}</td>
                 </tr>
               );
             })}

@@ -59,7 +59,17 @@ export async function proxy(request: NextRequest) {
     return startsWithAny(path, PUBLIC_PATHS) ? response : redirectTo("/sign-in", true);
   }
 
-  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  // Already through two-step sign-in: the verified token says so, nothing else to check.
+  if (data?.claims?.aal === "aal2") {
+    if (path === "/sign-in" || startsWithAny(path, TWO_STEP_PATHS.slice(0, 2))) return redirectTo("/");
+    return response;
+  }
+
+  // Not yet: ask the Auth server whether this person has an authenticator set up.
+  const { data: sessionData } = await supabase.auth.getSession();
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel(
+    sessionData.session?.access_token,
+  );
   const needsSetup = aal?.nextLevel !== "aal2";
   const needsCode = aal?.currentLevel !== "aal2" && aal?.nextLevel === "aal2";
 
