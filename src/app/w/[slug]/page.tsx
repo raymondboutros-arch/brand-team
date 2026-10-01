@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TaskTable } from "@/components/task-table";
 import { createClient } from "@/lib/supabase/server";
 import { firstName, formatWhen, getViewer, getWorkspace } from "@/lib/hq";
-import { MODULES } from "@/lib/modules";
+import { daysBetween, formatDay, todayInBeirut } from "@/lib/dates";
+import { getPlan, getSections, isLate } from "@/lib/plan";
+import { setTaskStatus } from "./plan/actions";
 
 export const metadata: Metadata = { title: "Overview" };
 
-const MILESTONES = [
-  { label: "Setup, sign-in and workspaces", when: "Live", done: true },
-  { label: "Plan, tasks, decisions and the action queue", when: "16 Oct" },
-  { label: "Brand and channels", when: "23 Oct" },
-  { label: "Content, scorecard and audit", when: "30 Oct" },
-  { label: "Claude connector and Search Console", when: "13 Nov" },
-  { label: "The two docs move into HQ", when: "16 Nov" },
-  { label: "livbrid.com goes live", when: "1 Dec" },
-];
+const LAUNCH = "2026-12-01";
 
 function greeting() {
   const hour = Number(
@@ -29,21 +24,33 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
   const { slug } = await params;
   const [viewer, workspace] = await Promise.all([getViewer(), getWorkspace(slug)]);
   const supabase = await createClient();
+  const today = todayInBeirut();
+  const base = `/w/${workspace.slug}`;
+  const canEdit = workspace.role === "owner" || workspace.role === "team";
 
-  const [{ data: activity }, { count: memberCount }] = await Promise.all([
+  const [plan, { byKey: s }, { count: memberCount }, { data: activity }] = await Promise.all([
+    getPlan(workspace.id),
+    getSections(workspace.id, "plan"),
+    supabase.from("members").select("user_id", { count: "exact", head: true }).eq("workspace_id", workspace.id),
     supabase
       .from("activity")
       .select("id, summary, via, created_at")
       .eq("workspace_id", workspace.id)
       .order("created_at", { ascending: false })
       .limit(6),
-    supabase.from("members").select("user_id", { count: "exact", head: true }).eq("workspace_id", workspace.id),
   ]);
 
-  const base = `/w/${workspace.slug}`;
-  const docs = Array.from(
-    new Map(MODULES.filter((m) => m.until).map((m) => [m.until!.href, m.until!])).values(),
-  );
+  const thisWeek = plan.tasks.filter((t) => t.this_week);
+  const late = plan.tasks.filter((t) => !t.this_week && isLate(t, today));
+  const comingUp = plan.tasks
+    .filter((t) => !t.this_week && t.status !== "done" && !isLate(t, today))
+    .slice(0, 6);
+  const decisionsDue = plan.openDecisions
+    .filter((d) => d.due_on && daysBetween(today, d.due_on) <= 21)
+    .sort((a, b) => (a.due_on ?? "").localeCompare(b.due_on ?? ""));
+  const daysToLaunch = daysBetween(today, LAUNCH);
+  const wsById = new Map(plan.workstreams.map((w) => [w.id, w]));
+  const save = canEdit ? setTaskStatus.bind(null, slug) : undefined;
 
   return (
     <div className="max-w-[1080px]">
@@ -51,85 +58,111 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
       <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">
         {greeting()}, <span className="font-serif italic font-normal">{firstName(viewer)}</span>
       </h1>
-      <p className="mt-3 max-w-[60ch] text-muted">
-        HQ is being built one module a week. Each one is usable on the Friday it lands. Until then,
-        the docs below stay the source of truth.
+      <p className="mt-3 max-w-[64ch] text-muted">
+        {daysToLaunch > 0 ? (
+          <>
+            <span className="text-ink font-medium">{daysToLaunch} days</span> until livbrid.com goes live on 1 December.{" "}
+          </>
+        ) : null}
+        {decisionsDue.length > 0
+          ? `${decisionsDue.length} decisions are due soon, and ${thisWeek.filter((t) => t.status !== "done").length} tasks are open this week.`
+          : `${thisWeek.filter((t) => t.status !== "done").length} tasks are open this week.`}
       </p>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-        <section className="card p-6" aria-labelledby="build-h">
-          <h2 id="build-h" className="text-lg font-semibold">Build progress</h2>
-          <ol className="mt-4 divide-y divide-line">
-            {MILESTONES.map((m) => (
-              <li key={m.label} className="flex items-center gap-3 py-3">
-                <span
-                  aria-hidden
-                  className={`size-2.5 shrink-0 rounded-full ${m.done ? "bg-ink" : "border border-line-strong"}`}
-                />
-                <span className={`flex-1 ${m.done ? "font-medium" : "text-muted"}`}>{m.label}</span>
-                <span className={`text-sm tabular-nums ${m.done ? "text-ok font-medium" : "text-faint"}`}>
-                  {m.when}
-                </span>
-              </li>
-            ))}
-          </ol>
+      {decisionsDue.length > 0 && (
+        <section className="mt-10" aria-labelledby="dec-h">
+          <div className="flex items-baseline justify-between">
+            <h2 id="dec-h" className="text-lg font-semibold">Decisions due</h2>
+            <Link href={`${base}/plan#decisions`} className="link text-sm">All decisions</Link>
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {decisionsDue.map((d) => {
+              const overdue = d.due_on! < today;
+              return (
+                <li key={d.id}>
+                  <Link
+                    href={`${base}/plan#${d.code?.toLowerCase()}`}
+                    className="flex h-full items-start gap-4 rounded-lg border border-line bg-card p-4 hover:border-ink"
+                  >
+                    <span className="font-serif text-[26px] italic leading-none">{d.code}</span>
+                    <span className="flex-1">
+                      <span className="block font-medium">{d.title}</span>
+                      <span className={`mt-0.5 block text-sm ${overdue ? "text-danger" : "text-muted"}`}>
+                        Due {formatDay(d.due_on)}
+                        {overdue ? ", late" : ""}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      <section className="mt-10" aria-labelledby="week-h">
+        <div className="flex items-baseline justify-between">
+          <h2 id="week-h" className="text-lg font-semibold">{s["this-week"]?.title ?? "This week"}</h2>
+          <Link href={`${base}/plan#this-week`} className="link text-sm">Open the plan</Link>
+        </div>
+        <div className="mt-3">
+          <TaskTable tasks={thisWeek} today={today} save={save} workstreams={plan.workstreams} />
+        </div>
+      </section>
+
+      <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <section className="card p-6" aria-labelledby="next-h">
+          <h2 id="next-h" className="text-lg font-semibold">Coming up</h2>
+          {late.length > 0 && (
+            <p className="mt-1 text-sm text-danger">
+              {late.length} {late.length === 1 ? "task is" : "tasks are"} late.{" "}
+              <Link href={`${base}/plan`} className="underline underline-offset-4">See the plan</Link>
+            </p>
+          )}
+          <ul className="mt-3 divide-y divide-line">
+            {comingUp.map((t) => {
+              const ws = t.workstream_id ? wsById.get(t.workstream_id) : undefined;
+              return (
+                <li key={t.id} className="flex items-baseline justify-between gap-4 py-3">
+                  <span>
+                    {t.title}
+                    <span className="block text-[13px] text-faint">
+                      {t.owner}
+                      {ws ? ` · ${ws.number}. ${ws.title}` : ""}
+                    </span>
+                  </span>
+                  <span className="whitespace-nowrap text-sm text-muted">{formatDay(t.due_on)}</span>
+                </li>
+              );
+            })}
+          </ul>
         </section>
 
-        <div className="flex flex-col gap-6">
-          <section className="card p-6" aria-labelledby="docs-h">
-            <h2 id="docs-h" className="text-lg font-semibold">Until then, work here</h2>
-            <ul className="mt-3 space-y-2 prose-hq">
-              {docs.map((d) => (
-                <li key={d.href}>
-                  <a href={d.href} target="_blank" rel="noreferrer">
-                    {d.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="card p-6" aria-labelledby="people-h">
-            <h2 id="people-h" className="text-lg font-semibold">People</h2>
-            <p className="mt-1 text-sm text-muted">
-              {memberCount ?? 0} {memberCount === 1 ? "person has" : "people have"} access to {workspace.name}.
-            </p>
-            {workspace.role === "owner" ? (
-              <Link href={`${base}/people`} className="btn btn-primary mt-4">
-                Invite people
-              </Link>
-            ) : (
-              <Link href={`${base}/people`} className="link mt-3 inline-block text-sm">
-                See who’s here
-              </Link>
-            )}
-          </section>
-        </div>
-      </div>
-
-      <section className="mt-6 card p-6" aria-labelledby="activity-h">
-        <div className="flex items-baseline justify-between">
-          <h2 id="activity-h" className="text-lg font-semibold">Latest changes</h2>
-          <Link href={`${base}/activity`} className="link text-sm">
-            All activity
-          </Link>
-        </div>
-        {activity && activity.length > 0 ? (
+        <section className="card p-6" aria-labelledby="activity-h">
+          <div className="flex items-baseline justify-between">
+            <h2 id="activity-h" className="text-lg font-semibold">Latest changes</h2>
+            <Link href={`${base}/activity`} className="link text-sm">All activity</Link>
+          </div>
           <ul className="mt-3 divide-y divide-line">
-            {activity.map((a) => (
-              <li key={a.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
-                <span>
-                  {a.summary}
-                  {a.via === "claude" && <span className="ml-2 text-xs text-muted">through Claude</span>}
+            {(activity ?? []).map((a) => (
+              <li key={a.id} className="py-3">
+                <span className="line-clamp-2">{a.summary}</span>
+                <span className="mt-0.5 block text-[13px] text-faint">
+                  {formatWhen(a.created_at)}
+                  {a.via === "claude" ? " · through Claude" : ""}
                 </span>
-                <span className="text-sm text-faint">{formatWhen(a.created_at)}</span>
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="mt-3 text-sm text-muted">Nothing yet.</p>
-        )}
-      </section>
+        </section>
+      </div>
+
+      {workspace.role === "owner" && memberCount === 1 && (
+        <p className="mt-10 text-sm text-muted">
+          You&apos;re the only one here for now.{" "}
+          <Link href={`${base}/people`} className="link">Invite Tony and Moe</Link> once email sending is set up.
+        </p>
+      )}
     </div>
   );
 }

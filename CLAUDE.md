@@ -38,8 +38,21 @@ LIVBRID is the first workspace, Pro Ink the second. The product spec lives in th
 - Add a new file in `supabase/migrations/` (timestamped) and apply the same SQL to the project.
 - After any schema change, run the Supabase security and performance advisors and fix warnings.
 
+## Updating HQ from a Claude chat (until the connector ships)
+
+Ray asks in chat; Claude writes through the Supabase connector with SQL, acting as Ray so the
+activity log reads "Ray, through Claude". Start every write with:
+
+```sql
+select set_config('request.jwt.claims', '{"sub":"<Ray user id>","role":"authenticated"}', true);
+select set_config('request.headers', '{"x-hq-via":"claude"}', true);
+```
+
+Bulk maintenance (imports, test accounts) adds `select set_config('app.skip_log', 'on', true);`
+and writes one summary line to `activity` instead of one per row.
+
 ## Build order (version 1)
 
-Setup and sign-in (done) · Plan, tasks, decisions, action queue (16 Oct) · Brand and channels
-(23 Oct) · Content, scorecard, audit (30 Oct) · Claude connector and Search Console (13 Nov) ·
-Docs move into HQ (16 Nov). Module list and dates: `src/lib/modules.ts`.
+Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference, imported from
+the Claude docs on 1 Oct. Next: Action queue (16 Oct) · Channels (23 Oct) · Content and Audit
+(30 Oct) · Claude connector and Search Console (13 Nov). Module list: `src/lib/modules.ts`.

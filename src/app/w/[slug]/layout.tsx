@@ -16,8 +16,16 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
     <nav aria-label="Workspace" className="flex flex-col gap-6">
       <div>
         <NavLink href={base} exact>Overview</NavLink>
-        {MODULES.map((m) => (
-          <NavLink key={m.key} href={`${base}/${m.key}`} note={m.ready ? undefined : shortDate(m.lands)}>
+        {MODULES.filter((m) => m.ready).map((m) => (
+          <NavLink key={m.key} href={`${base}/${m.key}`}>
+            {m.label}
+          </NavLink>
+        ))}
+      </div>
+      <div>
+        <p className="eyebrow px-3 mb-1.5 text-paper/45">Coming next</p>
+        {MODULES.filter((m) => !m.ready).map((m) => (
+          <NavLink key={m.key} href={`${base}/${m.key}`} note={m.lands ? shortDate(m.lands) : undefined}>
             {m.label}
           </NavLink>
         ))}

@@ -75,3 +75,113 @@ a.link:hover,
     @apply text-xs font-semibold uppercase tracking-[0.08em] text-faint;
   }
 }
+
+/* Long-form text written in Markdown: plan notes, strategy, reference. */
+.md {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-ink);
+}
+.md > * + * {
+  margin-top: 0.9em;
+}
+.md h3 {
+  margin-top: 2em;
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 650;
+}
+.md h4 {
+  margin-top: 1.5em;
+  font-weight: 650;
+}
+.md p {
+  max-width: 72ch;
+}
+.md strong {
+  font-weight: 650;
+}
+.md ul,
+.md ol {
+  padding-left: 1.3em;
+  max-width: 72ch;
+}
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md li + li {
+  margin-top: 0.35em;
+}
+.md li > ul,
+.md li > ol {
+  margin-top: 0.35em;
+}
+.md li::marker {
+  color: var(--color-faint);
+}
+.md ul:has(> li > .md-check) {
+  list-style: none;
+  padding-left: 0;
+}
+.md-check {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  vertical-align: -3px;
+  border: 1.5px solid var(--color-line-strong);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+}
+.md-check-on {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+.md a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.md code {
+  font-size: 0.9em;
+  background: var(--color-wash);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.md-table {
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-card);
+}
+.md table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.md th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-muted);
+  background: var(--color-wash);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-line);
+  white-space: nowrap;
+}
+.md td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--color-line);
+  vertical-align: top;
+  min-width: 8ch;
+}
+.md tr:first-child td {
+  border-top: 0;
+}

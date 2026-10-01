@@ -88,5 +88,5 @@ export function formatWhen(iso: string) {
       .formatToParts(new Date(iso))
       .map((p) => [p.type, p.value]),
   );
-  return `${parts.day} ${MONTHS[Number(parts.month) - 1]}, ${parts.hour}:${parts.minute}`;
+  return `${Number(parts.day)} ${MONTHS[Number(parts.month) - 1]}, ${parts.hour}:${parts.minute}`;
 }
