@@ -35,7 +35,8 @@ export const MODULES: Module[] = [
   {
     key: "reference",
     label: "Reference",
-    summary: "The project audit, the Clarity Diagnostic, the build spec, the AI baseline and prompt log, the sitemap and service names.",
+    summary:
+      "The project audit, the Clarity Diagnostic, the build spec, the AI baseline and prompt log, the sitemap, service names and the client permission request.",
     ready: true,
   },
   {

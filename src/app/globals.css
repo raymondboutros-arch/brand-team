@@ -154,6 +154,33 @@ a.link:hover,
   padding: 0.1em 0.35em;
   border-radius: 4px;
 }
+/* Ready-to-use text (emails, messages), written as ```template Label */
+.md-template {
+  max-width: 72ch;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-card);
+  overflow: hidden;
+}
+.md-template-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px 6px 16px;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-wash);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+.md-template-body {
+  padding: 14px 16px 16px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.6;
+}
 .md-table {
   overflow-x: auto;
   border: 1px solid var(--color-line);
