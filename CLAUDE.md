@@ -54,5 +54,11 @@ and writes one summary line to `activity` instead of one per row.
 ## Build order (version 1)
 
 Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference, imported from
-the Claude docs on 1 Oct. Next: Action queue (16 Oct) · Channels (23 Oct) · Content and Audit
-(30 Oct) · Claude connector and Search Console (13 Nov). Module list: `src/lib/modules.ts`.
+the Claude docs on 1 Oct. Next: Action queue (16 Oct) · Channels (23 Oct) · Content and Projects
+(30 Oct) · Proposals (6 Nov) · Visibility, with Search Console and the Claude connector (13 Nov).
+Module list: `src/lib/modules.ts`.
+
+Projects, Proposals and Visibility come from Ray's list of 1 October; the spec section
+"Studio modules: Ray's list, 1 October" has the fields and rules. Studio money (payments, costs,
+hours, profit) is Owner only (`private.is_owner`) and lives only in the LIVBRID workspace, never in
+a client's. Close-out answers are facts (hours, invoiced, paid, outside costs), not 1 to 5 scores.

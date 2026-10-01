@@ -63,20 +63,31 @@ export const MODULES: Module[] = [
     until: { text: "Until it lands, the launch articles are tracked in", label: "Plan, workstream 4", path: "plan#ws-4" },
   },
   {
-    key: "audit",
-    label: "Audit",
-    summary: "The 30-project audit, imported from the sheet.",
+    key: "projects",
+    label: "Projects",
+    summary:
+      "Every project from signed to closed: brief and real need, deliverables, timeline, price, and the close-out answers, so the next audit is already filled. Payments, outside costs, hours and profit are for the Owner only. Starts with the 30 projects and the lost pitches from the audit sheet.",
     lands: "Friday 30 October",
     ready: false,
     until: { text: "Until it lands, the audit findings are in", label: "Reference", path: "reference#project-audit" },
   },
   {
-    key: "connections",
-    label: "Connections",
-    summary: "Google Search Console: clicks, impressions and top searches, monthly. Plus the Claude connector.",
+    key: "proposals",
+    label: "Proposals",
+    summary:
+      "Prices for the Clarity Diagnostic, the Build and the Keep plan, and a proposal builder: intro, date, title, our thinking, scope, timeline and price, saved as a PDF. Every enquiry and proposal is followed to won or lost, and a won proposal becomes a project.",
+    lands: "Friday 6 November",
+    ready: false,
+    until: { text: "Until it lands, the prices are decisions D1 to D3 in the", label: "Plan", path: "plan#decisions" },
+  },
+  {
+    key: "visibility",
+    label: "Visibility",
+    summary:
+      "Where LIVBRID stands on Google, in AI answers and on other sites: Search Console, the 20-prompt AI check and Ahrefs, saved every Monday, with a check-now button. Search Console and the Claude connector are connected here.",
     lands: "Friday 13 November",
     ready: false,
-    until: { text: "Until it lands, the Google baseline is in", label: "Reference", path: "reference#ai-visibility" },
+    until: { text: "Until it lands, the Google and AI baseline is in", label: "Reference", path: "reference#ai-visibility" },
   },
 ];
 
