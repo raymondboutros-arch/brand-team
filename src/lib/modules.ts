@@ -78,7 +78,7 @@ export const MODULES: Module[] = [
       "Prices for the Clarity Diagnostic, the Build and the Keep plan, and a proposal builder: intro, date, title, our thinking, scope, timeline and price, saved as a PDF. Every enquiry and proposal is followed to won or lost, and a won proposal becomes a project.",
     lands: "Friday 6 November",
     ready: false,
-    until: { text: "Until it lands, the prices are decisions D1 to D3 in the", label: "Plan", path: "plan#decisions" },
+    until: { text: "Until it lands, the prices and timeline are D1 to D3 in the", label: "decision log", path: "plan#decision-log" },
   },
   {
     key: "visibility",
