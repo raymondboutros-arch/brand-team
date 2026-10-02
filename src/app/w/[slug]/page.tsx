@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TaskTable } from "@/components/task-table";
+import { AREA_LABEL, IMPACT_LABEL, getActions } from "@/lib/actions";
 import { createClient } from "@/lib/supabase/server";
 import { firstName, formatWhen, getViewer, getWorkspace } from "@/lib/hq";
 import { daysBetween, formatDay, todayInBeirut } from "@/lib/dates";
@@ -28,7 +29,7 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
   const base = `/w/${workspace.slug}`;
   const canEdit = workspace.role === "owner" || workspace.role === "team";
 
-  const [plan, { byKey: s }, { count: memberCount }, { data: activity }] = await Promise.all([
+  const [plan, { byKey: s }, { count: memberCount }, { data: activity }, queue] = await Promise.all([
     getPlan(workspace.id),
     getSections(workspace.id, "plan"),
     supabase.from("members").select("user_id", { count: "exact", head: true }).eq("workspace_id", workspace.id),
@@ -38,7 +39,9 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
       .eq("workspace_id", workspace.id)
       .order("created_at", { ascending: false })
       .limit(6),
+    getActions(workspace.id),
   ]);
+  const waiting = queue.byStatus.waiting;
 
   const thisWeek = plan.tasks.filter((t) => t.this_week);
   const late = plan.tasks.filter((t) => !t.this_week && isLate(t, today));
@@ -96,6 +99,36 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
                 </li>
               );
             })}
+          </ul>
+        </section>
+      )}
+
+      {waiting.length > 0 && (
+        <section className="mt-10" aria-labelledby="aq-h">
+          <div className="flex items-baseline justify-between">
+            <h2 id="aq-h" className="text-lg font-semibold">Waiting for a decision</h2>
+            <Link href={`${base}/actions`} className="link text-sm">
+              {waiting.length > 4 ? `All ${waiting.length} in the action queue` : "Action queue"}
+            </Link>
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {waiting.slice(0, 4).map((a) => (
+              <li key={a.id}>
+                <Link
+                  href={`${base}/actions#a${a.number}`}
+                  className="flex h-full items-start gap-4 rounded-lg border border-line bg-card p-4 hover:border-ink"
+                >
+                  <span className="font-serif text-[26px] italic leading-none">A{a.number}</span>
+                  <span className="flex-1">
+                    <span className="block font-medium">{a.title}</span>
+                    <span className="mt-0.5 block text-sm text-muted">
+                      {AREA_LABEL[a.area]} · {IMPACT_LABEL[a.impact]}
+                      {a.source === "claude" ? " · from Claude" : ""}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </section>
       )}

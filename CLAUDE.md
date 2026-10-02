@@ -44,17 +44,22 @@ Ray asks in chat; Claude writes through the Supabase connector with SQL, acting 
 activity log reads "Ray, through Claude". Start every write with:
 
 ```sql
-select set_config('request.jwt.claims', '{"sub":"<Ray user id>","role":"authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub":"<Ray user id>","role":"authenticated","aal":"aal2"}', true);
 select set_config('request.headers', '{"x-hq-via":"claude"}', true);
 ```
 
 Bulk maintenance (imports, test accounts) adds `select set_config('app.skip_log', 'on', true);`
 and writes one summary line to `activity` instead of one per row.
 
+`aal2` matters: the action queue's guard trigger checks the role through `private.can_edit`, which
+needs two-step. To add a finding, insert into `public.actions` (workspace_id, title, area, impact,
+finding, evidence_url, fix, owner, due_on). The number (A1, A2...) and `source = 'claude'` are set
+by the database from the header; findings start as waiting and only a person approves them.
+
 ## Build order (version 1)
 
 Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference, imported from
-the Claude docs on 1 Oct. Next: Action queue (16 Oct) · Channels (23 Oct) · Content and Projects
+the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct). Next: Channels (23 Oct) · Content and Projects
 (30 Oct) · Proposals (6 Nov) · Visibility, with Search Console and the Claude connector (13 Nov).
 Module list: `src/lib/modules.ts`.
 

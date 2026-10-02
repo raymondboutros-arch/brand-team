@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/wordmark";
+import { countWaiting } from "@/lib/actions";
 import { getMyWorkspaces, getViewer, getWorkspace, ROLE_LABEL } from "@/lib/hq";
 import { MODULES } from "@/lib/modules";
 import { NavLink } from "./nav-link";
@@ -9,6 +10,7 @@ const shortDate = (lands: string) => lands.replace("Friday ", "").replace(/(\d+)
 export default async function WorkspaceLayout({ children, params }: LayoutProps<"/w/[slug]">) {
   const { slug } = await params;
   const [viewer, workspace, all] = await Promise.all([getViewer(), getWorkspace(slug), getMyWorkspaces()]);
+  const waiting = await countWaiting(workspace.id);
   const base = `/w/${workspace.slug}`;
   const displayName = viewer.name ?? viewer.email;
 
@@ -17,7 +19,11 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
       <div>
         <NavLink href={base} exact>Overview</NavLink>
         {MODULES.filter((m) => m.ready).map((m) => (
-          <NavLink key={m.key} href={`${base}/${m.key}`}>
+          <NavLink
+            key={m.key}
+            href={`${base}/${m.key}`}
+            note={m.key === "actions" && waiting > 0 ? `${waiting} waiting` : undefined}
+          >
             {m.label}
           </NavLink>
         ))}

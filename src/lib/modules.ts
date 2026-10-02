@@ -43,9 +43,7 @@ export const MODULES: Module[] = [
     key: "actions",
     label: "Action queue",
     summary: "Findings, each with evidence, a proposed fix, and approve or dismiss. Added by the team or by Claude.",
-    lands: "Friday 16 October",
-    ready: false,
-    until: { text: "Until it lands, findings become tasks in the", label: "Plan", path: "plan" },
+    ready: true,
   },
   {
     key: "channels",

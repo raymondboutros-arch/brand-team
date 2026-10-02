@@ -8,6 +8,11 @@ export function todayInBeirut() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Beirut" }).format(new Date());
 }
 
+/** The Beirut calendar day (YYYY-MM-DD) of a stored timestamp. */
+export function dayInBeirut(timestamp: string) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Beirut" }).format(new Date(timestamp));
+}
+
 /**
  * "9 October", or "29 January 2027" when the year differs from this year.
  * LIVBRID writing rule: months written out.
