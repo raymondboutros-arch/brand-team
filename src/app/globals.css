@@ -37,9 +37,6 @@ body {
   color: var(--color-paper);
 }
 
-table {
-  font-variant-numeric: tabular-nums;
-}
 
 /* Search words inside results */
 mark.search-hit {

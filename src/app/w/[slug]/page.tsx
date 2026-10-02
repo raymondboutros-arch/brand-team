@@ -58,7 +58,12 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
   return (
     <div className="max-w-[1080px]">
       <h1 className="page-title">
-        {greeting()}, <span className="font-serif italic font-normal">{firstName(viewer)}</span>
+        {greeting()}
+        {viewer.name ? (
+          <>
+            , <span className="font-serif italic font-normal">{firstName(viewer)}</span>
+          </>
+        ) : null}
       </h1>
       <p className="page-intro">
         {daysToLaunch > 0 ? (

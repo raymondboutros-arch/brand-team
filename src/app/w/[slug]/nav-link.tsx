@@ -29,7 +29,7 @@ export function NavLink({
       }`}
     >
       <span>{children}</span>
-      {note && <span className={`text-xs tabular-nums ${active ? "text-paper/70" : "text-paper/45"}`}>{note}</span>}
+      {note && <span className={`text-xs ${active ? "text-paper/70" : "text-paper/45"}`}>{note}</span>}
     </Link>
   );
 }

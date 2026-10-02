@@ -96,10 +96,10 @@ export default async function SearchPage({ params, searchParams }: PageProps<"/w
                   <li key={h.id}>
                     <Link
                       href={`${base}/${h.href}`}
-                      className="group grid grid-cols-[44px_1fr] gap-x-3 py-4 sm:grid-cols-[56px_1fr]"
+                      className={`group py-4 ${h.mark ? "grid grid-cols-[44px_1fr] gap-x-3 sm:grid-cols-[56px_1fr]" : "block"}`}
                     >
-                      <span className="ref-mark text-[24px] leading-[1.1] text-ink">{h.mark ?? ""}</span>
-                      <span className="min-w-0">
+                      {h.mark && <span className="ref-mark text-[24px] leading-[1.1] text-ink">{h.mark}</span>}
+                      <span className="block min-w-0">
                         <span className="block font-medium leading-snug group-hover:underline group-hover:underline-offset-4">
                           <Highlight text={h.title} terms={terms} />
                         </span>
