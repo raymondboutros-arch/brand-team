@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Md } from "@/components/markdown";
 import { getWorkspace } from "@/lib/hq";
-import { formatDay, formatMonth } from "@/lib/dates";
-import { getScorecard, getSections } from "@/lib/plan";
+import { formatDay, formatMonth, todayInBeirut } from "@/lib/dates";
+import { AUTO_FROM, AUTO_METRICS, getScorecard, getScorecardAuto, getSections } from "@/lib/plan";
 
 export const metadata: Metadata = { title: "Scorecard" };
 
@@ -32,15 +32,31 @@ function months(from: string, to: string) {
 export default async function ScorecardPage({ params }: PageProps<"/w/[slug]/scorecard">) {
   const { slug } = await params;
   const workspace = await getWorkspace(slug);
-  const [{ byKey: s }, sc] = await Promise.all([getSections(workspace.id, "plan"), getScorecard(workspace.id)]);
+  const thisMonth = todayInBeirut().slice(0, 8) + "01";
+  const [{ byKey: s }, sc, auto] = await Promise.all([
+    getSections(workspace.id, "plan"),
+    getScorecard(workspace.id),
+    workspace.isStudio ? getScorecardAuto(workspace.id, thisMonth) : Promise.resolve(new Map<string, string>()),
+  ]);
+  const isAuto = (key: string) => auto.size > 0 && (AUTO_METRICS as readonly string[]).includes(key);
 
   const goals = sc.metrics
     .filter((m) => m.goal_label)
     .sort((a, b) => (a.goal_position ?? 0) - (b.goal_position ?? 0));
   const target = (metricId: string, date: string) =>
     sc.targets.find((t) => t.metric_id === metricId && t.on_date === date)?.value;
-  const value = (metricId: string, month: string) =>
+  const stored = (metricId: string, month: string) =>
     sc.values.find((v) => v.metric_id === metricId && v.month === month);
+  // From October 2026 the sales numbers come from Proposals and Projects, not by hand.
+  const value = (metricId: string, month: string) => {
+    const m = sc.metrics.find((x) => x.id === metricId);
+    if (m && isAuto(m.key) && month >= AUTO_FROM && auto.has(`${m.key}|${month}`)) {
+      return { value: auto.get(`${m.key}|${month}`)!, note: null };
+    }
+    return stored(metricId, month);
+  };
+  const now = (m: { id: string; key: string; baseline: string | null }) =>
+    isAuto(m.key) && auto.has(`${m.key}|${thisMonth}`) ? auto.get(`${m.key}|${thisMonth}`)! : m.baseline;
   const rows = months("2026-09-01", "2027-06-01");
 
   return (
@@ -67,7 +83,7 @@ export default async function ScorecardPage({ params }: PageProps<"/w/[slug]/sco
               {goals.map((m) => (
                 <tr key={m.id}>
                   <th scope="row" className="px-4 py-3 text-left font-normal min-w-[24ch]">{m.goal_label}</th>
-                  <td className="px-4 py-3"><Value v={m.baseline} /></td>
+                  <td className="px-4 py-3"><Value v={now(m)} /></td>
                   {TARGET_DATES.map((d) => (
                     <td key={d} className="px-4 py-3"><Value v={target(m.id, d)} /></td>
                   ))}
@@ -113,6 +129,12 @@ export default async function ScorecardPage({ params }: PageProps<"/w/[slug]/sco
           </table>
         </div>
         {s.scorecard?.summary && <p className="mt-3 text-sm text-muted">{s.scorecard.summary}</p>}
+        {auto.size > 0 && (
+          <p className="mt-2 text-sm text-muted">
+            From October 2026, enquiries, Diagnostics sold, Builds signed after a Diagnostic and Keep plans active fill
+            themselves from Proposals and Projects.
+          </p>
+        )}
       </section>
     </div>
   );

@@ -21,6 +21,9 @@ export type ProjectFormValues = {
   ends_on?: string | null;
   duration?: string | null;
   price_usd?: number | null;
+  price_per?: string;
+  offer?: string | null;
+  signed_on?: string | null;
   referred?: string | null;
   came_back?: string | null;
   five_more?: string | null;
@@ -76,7 +79,7 @@ export function ProjectForm({
   slug: string;
   projectId: string | null;
   values?: ProjectFormValues;
-  options: { status: Option[]; clientType: Option[]; source: Option[]; proof: Option[] };
+  options: { status: Option[]; clientType: Option[]; source: Option[]; proof: Option[]; offer: Option[] };
   submitLabel: string;
 }) {
   const [state, action, pending] = useActionState(saveProject.bind(null, slug, projectId), {} as FormState);
@@ -130,8 +133,20 @@ export function ProjectForm({
               ))}
             </select>
           </Field>
+          <Field id="offer" label="What we sold">
+            <Select id="offer" value={v.offer} options={options.offer} blank="Before the three offers" />
+          </Field>
           <Field id="price_usd" label="Price" hint="USD">
             <input id="price_usd" name="price_usd" inputMode="decimal" defaultValue={v.price_usd ?? ""} className="field" placeholder="8000" />
+          </Field>
+          <Field id="price_per" label="Charged">
+            <select id="price_per" name="price_per" defaultValue={v.price_per ?? "once"} className="field">
+              <option value="once">Once</option>
+              <option value="month">Every month</option>
+            </select>
+          </Field>
+          <Field id="signed_on" label="Signed on" hint="counts on the Scorecard">
+            <input id="signed_on" name="signed_on" type="date" defaultValue={v.signed_on ?? ""} className="field" />
           </Field>
           <Field id="year" label="Year">
             <input id="year" name="year" inputMode="numeric" maxLength={4} defaultValue={v.year ?? ""} className="field" placeholder="2026" />

@@ -35,6 +35,10 @@ export type Project = {
   lost_said: string | null;
   lost_think: string | null;
   notes: string | null;
+  offer: "diagnostic" | "build" | "keep" | "custom" | null;
+  price_per: "once" | "month";
+  signed_on: string | null;
+  enquiry_id: string | null;
   updated_at: string;
 };
 
@@ -103,6 +107,13 @@ export const PROFIT_RANGE: Record<string, string> = {
   excellent: "Excellent",
 };
 
+export const OFFER: Record<string, string> = {
+  diagnostic: "Clarity Diagnostic",
+  build: "Build",
+  keep: "Keep plan",
+  custom: "Custom work",
+};
+
 export const MONEY_KIND: Record<MoneyLine["kind"], string> = {
   invoiced: "Invoiced",
   paid: "Paid",
@@ -125,10 +136,11 @@ export const PROJECT_OPTIONS = {
   clientType: Object.entries(CLIENT_TYPE),
   source: Object.entries(SOURCE),
   proof: Object.entries(PROOF),
+  offer: Object.entries(OFFER),
 } as const;
 
 const COLUMNS =
-  "id, number, client, sector, client_type, source, buyer, brief, real_need, deliverables, lead_person, status, year, starts_on, ends_on, duration, price_usd, referred, came_back, five_more, brand_to_website, proof, result, testimonial, may_name, may_name_note, lost_said, lost_think, notes, updated_at";
+  "id, number, client, sector, client_type, source, buyer, brief, real_need, deliverables, lead_person, status, year, starts_on, ends_on, duration, price_usd, referred, came_back, five_more, brand_to_website, proof, result, testimonial, may_name, may_name_note, lost_said, lost_think, notes, offer, price_per, signed_on, enquiry_id, updated_at";
 
 export async function getProjects(workspaceId: string) {
   const supabase = await createClient();
@@ -199,10 +211,11 @@ export function totals(lines: MoneyLine[], hours: HoursLine[]) {
   };
 }
 
-export function usd(n: number | null | undefined, { cents = false } = {}) {
+export function usd(n: number | null | undefined, { cents = false, per = "once" }: { cents?: boolean; per?: string } = {}) {
   if (n === null || n === undefined) return "";
   return (
     "USD " +
-    n.toLocaleString("en-US", { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 })
+    n.toLocaleString("en-US", { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }) +
+    (per === "month" ? " a month" : "")
   );
 }

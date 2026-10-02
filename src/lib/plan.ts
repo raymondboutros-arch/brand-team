@@ -144,6 +144,62 @@ export const getScorecard = cache(async (workspaceId: string) => {
   };
 });
 
+/** Scorecard numbers that fill themselves from Proposals and Projects (studio workspace only). */
+export const AUTO_METRICS = ["enquiries", "diagnostics", "builds", "keep_plans"] as const;
+export const AUTO_FROM = "2026-10-01";
+
+export const getScorecardAuto = cache(async (workspaceId: string, throughMonth: string) => {
+  const supabase = await createClient();
+  const [enq, proj] = await Promise.all([
+    supabase.from("enquiries").select("received_on").eq("workspace_id", workspaceId),
+    supabase
+      .from("projects")
+      .select("offer, status, signed_on, ends_on, enquiry_id")
+      .eq("workspace_id", workspaceId)
+      .not("offer", "is", null),
+  ]);
+  // Outside the studio workspace, or without access, row level security returns nothing.
+  if (enq.error || proj.error) return new Map<string, string>();
+  const enquiries = (enq.data ?? []) as { received_on: string }[];
+  const projects = (proj.data ?? []) as {
+    offer: string;
+    status: string;
+    signed_on: string | null;
+    ends_on: string | null;
+    enquiry_id: string | null;
+  }[];
+
+  const out = new Map<string, string>(); // "key|YYYY-MM-01" -> value
+  const d = new Date(AUTO_FROM + "T00:00:00Z");
+  const last = new Date(throughMonth + "T00:00:00Z");
+  while (d <= last) {
+    const start = d.toISOString().slice(0, 10);
+    const next = new Date(d);
+    next.setUTCMonth(next.getUTCMonth() + 1);
+    const end = new Date(next.getTime() - 86_400_000).toISOString().slice(0, 10);
+    const signedBy = (p: (typeof projects)[number]) => p.status !== "lost" && !!p.signed_on && p.signed_on <= end;
+
+    const diagnostics = projects.filter((p) => p.offer === "diagnostic" && signedBy(p));
+    const builds = projects.filter(
+      (p) =>
+        p.offer === "build" &&
+        signedBy(p) &&
+        !!p.enquiry_id &&
+        diagnostics.some((g) => g.enquiry_id === p.enquiry_id && g.signed_on! <= p.signed_on!),
+    );
+    const keep = projects.filter(
+      (p) => p.offer === "keep" && signedBy(p) && (p.status !== "closed" || (p.ends_on !== null && p.ends_on >= start)),
+    );
+
+    out.set(`enquiries|${start}`, String(enquiries.filter((e) => e.received_on >= start && e.received_on <= end).length));
+    out.set(`diagnostics|${start}`, String(diagnostics.length));
+    out.set(`builds|${start}`, String(builds.length));
+    out.set(`keep_plans|${start}`, String(keep.length));
+    d.setUTCMonth(d.getUTCMonth() + 1);
+  }
+  return out;
+});
+
 export const getBrandLines = cache(async (workspaceId: string) => {
   const supabase = await createClient();
   const [lines, versions] = await Promise.all([

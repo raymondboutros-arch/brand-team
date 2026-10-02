@@ -56,12 +56,17 @@ needs two-step. To add a finding, insert into `public.actions` (workspace_id, ti
 finding, evidence_url, fix, owner, due_on). The number (A1, A2...) and `source = 'claude'` are set
 by the database from the header; findings start as waiting and only a person approves them.
 
+Proposals follow the same rule: Claude may draft `our_thinking` (marked `thinking_by = 'claude'`), but the
+database refuses an approval that comes through Claude. Close a proposal with `select public.close_proposal(id,
+'won' | 'lost', said, think)` so the project is created with it.
+
 ## Build order (version 1)
 
 Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference, imported from
 the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct); Projects with Owner-only money, hours and
-profit (2 Oct, planned for 30 Oct). Next: Channels (23 Oct) · Content (30 Oct) · Proposals (6 Nov) · Visibility,
-with Search Console and the Claude connector (13 Nov).
+profit (2 Oct, planned for 30 Oct); Proposals with the price list, enquiries and the PDF (2 Oct, planned for
+6 Nov). Next: Channels (23 Oct) · Content (30 Oct) · Visibility, with Search Console and the Claude connector (13 Nov).
+Prices live only in the database (`price_list`), never in a migration file: the repo may be public.
 Module list: `src/lib/modules.ts`.
 
 Projects, Proposals and Visibility come from Ray's list of 1 October; the spec section

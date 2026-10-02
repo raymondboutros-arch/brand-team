@@ -17,7 +17,17 @@ export type Hit = {
   href: string; // path inside the workspace, e.g. "plan#ws-4"
 };
 
-export type Kind = "page" | "task" | "decision" | "workstream" | "action" | "project" | "line" | "metric";
+export type Kind =
+  | "page"
+  | "task"
+  | "decision"
+  | "workstream"
+  | "action"
+  | "project"
+  | "proposal"
+  | "enquiry"
+  | "line"
+  | "metric";
 
 export const KIND_LABEL: Record<Kind, string> = {
   page: "Pages",
@@ -25,6 +35,8 @@ export const KIND_LABEL: Record<Kind, string> = {
   task: "Tasks",
   action: "Action queue",
   project: "Projects",
+  proposal: "Proposals",
+  enquiry: "Enquiries",
   workstream: "Workstreams",
   line: "Brand lines",
   metric: "Scorecard",
@@ -49,6 +61,16 @@ const PROJECT_STATUS: Record<string, string> = {
   delivered: "Delivered",
   closed: "Closed",
   lost: "Lost pitch",
+};
+
+const SALES_STATUS: Record<string, string> = {
+  draft: "Draft",
+  approved: "Approved",
+  sent: "Sent",
+  won: "Won",
+  lost: "Lost",
+  open: "Open",
+  declined: "Not for us",
 };
 
 /** Words worth searching for: no PostgREST syntax characters, at most five words. */
@@ -98,7 +120,7 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
   const supabase = await createClient();
   const LIMIT = 25;
 
-  const [sections, tasks, decisions, workstreams, actions, projects, lines, metrics] = await Promise.all([
+  const [sections, tasks, decisions, workstreams, actions, projects, proposals, enquiries, lines, metrics] = await Promise.all([
     allTerms(
       supabase.from("sections").select("id, area, key, title, body_md").eq("workspace_id", workspaceId),
       ["title", "body_md"],
@@ -134,6 +156,19 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
         .select("id, number, client, sector, brief, real_need, deliverables, notes, status")
         .eq("workspace_id", workspaceId),
       ["client", "sector", "brief", "real_need", "deliverables", "notes"],
+      terms,
+    ).limit(LIMIT),
+    allTerms(
+      supabase
+        .from("proposals")
+        .select("id, number, title, client, our_thinking, scope, status")
+        .eq("workspace_id", workspaceId),
+      ["title", "client", "our_thinking", "scope"],
+      terms,
+    ).limit(LIMIT),
+    allTerms(
+      supabase.from("enquiries").select("id, number, client, sector, notes, status").eq("workspace_id", workspaceId),
+      ["client", "sector", "notes"],
       terms,
     ).limit(LIMIT),
     allTerms(
@@ -208,6 +243,28 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
       meta: [p.sector, PROJECT_STATUS[p.status]].filter(Boolean).join(", "),
       snippet: snippetFor(plain([p.deliverables, p.brief, p.real_need, p.notes].filter(Boolean).join(" ")), terms),
       href: `projects/${p.number}`,
+    });
+  }
+  for (const q of proposals.data ?? []) {
+    hits.push({
+      id: q.id,
+      kind: "proposal",
+      title: q.title,
+      mark: `Q${q.number}`,
+      meta: [q.client, SALES_STATUS[q.status]].filter(Boolean).join(", "),
+      snippet: snippetFor(plain([q.our_thinking, q.scope].filter(Boolean).join(" ")), terms),
+      href: `proposals/${q.number}`,
+    });
+  }
+  for (const e of enquiries.data ?? []) {
+    hits.push({
+      id: e.id,
+      kind: "enquiry",
+      title: e.client,
+      mark: `E${e.number}`,
+      meta: [e.sector, SALES_STATUS[e.status]].filter(Boolean).join(", "),
+      snippet: snippetFor(plain(e.notes), terms),
+      href: `proposals/enquiries/${e.number}`,
     });
   }
   for (const w of workstreams.data ?? []) {

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getWorkspace } from "@/lib/hq";
-import { CLIENT_TYPE, COST_CATEGORY, PROFIT_RANGE, PROOF, SOURCE, STATUSES } from "@/lib/projects";
+import { CLIENT_TYPE, COST_CATEGORY, OFFER, PROFIT_RANGE, PROOF, SOURCE, STATUSES } from "@/lib/projects";
 
 export type FormState = { error?: string; ok?: string };
 
@@ -47,6 +47,8 @@ export async function saveProject(slug: string, projectId: string | null, _prev:
   const year = yearRaw ? Number(yearRaw) : null;
   if (year !== null && (!Number.isInteger(year) || year < 2000 || year > 2100)) return { error: "The year should look like 2026." };
 
+  const signed_on = text(f, "signed_on", 10);
+  if (!isDate(signed_on)) return { error: "Pick the signing date from the calendar." };
   const starts_on = text(f, "starts_on", 10);
   const ends_on = text(f, "ends_on", 10);
   if (!isDate(starts_on) || !isDate(ends_on)) return { error: "Pick the dates from the calendar." };
@@ -68,6 +70,9 @@ export async function saveProject(slug: string, projectId: string | null, _prev:
     ends_on,
     duration: text(f, "duration", 40),
     price_usd: price,
+    price_per: oneOf(f, "price_per", ["once", "month"]) ?? "once",
+    offer: oneOf(f, "offer", Object.keys(OFFER)),
+    signed_on,
     referred: oneOf(f, "referred", ["yes", "no", "maybe"]),
     came_back: oneOf(f, "came_back", ["yes", "no", "maybe"]),
     five_more: oneOf(f, "five_more", ["yes", "no", "maybe"]),

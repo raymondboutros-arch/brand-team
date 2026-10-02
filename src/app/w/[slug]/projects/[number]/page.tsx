@@ -6,6 +6,7 @@ import {
   CLIENT_TYPE,
   COST_CATEGORY,
   MONEY_KIND,
+  OFFER,
   PROFIT_RANGE,
   PROJECT_OPTIONS,
   PROOF,
@@ -20,6 +21,7 @@ import {
   type Project,
 } from "@/lib/projects";
 import { formatDay, todayInBeirut } from "@/lib/dates";
+import { getEnquiryById } from "@/lib/proposals";
 import { SubmitButton } from "@/components/submit-button";
 import { ProjectForm } from "../project-form";
 import { removeHours, removeMoney, setProjectStatus } from "../mutations";
@@ -44,7 +46,10 @@ export default async function ProjectPage({ params }: PageProps<"/w/[slug]/proje
   const { slug, number } = await params;
   const { workspace, project: p } = await load(slug, number);
   const isOwner = workspace.role === "owner";
-  const money = isOwner ? await getMoney(workspace.id, p.id) : null;
+  const [money, enquiry] = await Promise.all([
+    isOwner ? getMoney(workspace.id, p.id) : Promise.resolve(null),
+    p.enquiry_id ? getEnquiryById(workspace.id, p.enquiry_id) : Promise.resolve(null),
+  ]);
   const today = todayInBeirut();
 
   const showCloseOut =
@@ -65,6 +70,14 @@ export default async function ProjectPage({ params }: PageProps<"/w/[slug]/proje
           <h1 className="page-title">{p.client}</h1>
           <p className="mt-2 text-[15px] text-muted">
             {[p.sector, p.client_type ? CLIENT_TYPE[p.client_type] : null, p.year].filter(Boolean).join(", ")}
+            {enquiry && (
+              <>
+                {". From enquiry "}
+                <Link href={`/w/${slug}/proposals/enquiries/${enquiry.number}`} className="link">
+                  E{enquiry.number}
+                </Link>
+              </>
+            )}
           </p>
         </div>
       </header>
@@ -94,7 +107,9 @@ export default async function ProjectPage({ params }: PageProps<"/w/[slug]/proje
       </form>
 
       <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
-        <Fact label="Price">{usd(p.price_usd)}</Fact>
+        <Fact label="Price">{usd(p.price_usd, { per: p.price_per })}</Fact>
+        <Fact label="What we sold">{p.offer ? OFFER[p.offer] : null}</Fact>
+        <Fact label="Signed">{p.signed_on ? formatDay(p.signed_on, { withYear: true }) : null}</Fact>
         <Fact label="Timeline">{timeline(p)}</Fact>
         <Fact label="How they found us">{p.source ? SOURCE[p.source] : null}</Fact>
         <Fact label="Who buys and decides">{p.buyer}</Fact>
@@ -220,7 +235,7 @@ function OwnerMoney({ slug, p, money, today }: { slug: string; p: Project; money
   const t = totals(money.lines, money.hours);
   const priv = money.private[0] ?? null;
   const figures: [string, string][] = [
-    ["Price", usd(p.price_usd) || "Not set"],
+    ["Price", usd(p.price_usd, { per: p.price_per }) || "Not set"],
     ["Invoiced", usd(t.invoiced)],
     ["Paid", usd(t.paid)],
     ["Still owed", usd(t.owed)],

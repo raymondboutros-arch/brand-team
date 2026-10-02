@@ -150,7 +150,7 @@ function Row({ p, href, showStatus, profit }: { p: Project; href: string; showSt
         <span className="line-clamp-2">{p.deliverables ?? p.brief ?? ""}</span>
       </td>
       <td className="px-4 py-3.5 text-muted">{p.year ?? ""}</td>
-      <td className="px-4 py-3.5 text-right whitespace-nowrap">{usd(p.price_usd)}</td>
+      <td className="px-4 py-3.5 text-right whitespace-nowrap">{usd(p.price_usd, { per: p.price_per })}</td>
       {showStatus && <td className="px-4 py-3.5 text-muted">{STATUS_LABEL[p.status]}</td>}
       {profit !== null && <td className="px-4 py-3.5 text-muted">{profit}</td>}
     </tr>
@@ -173,7 +173,7 @@ function OwnerSummary({ projects, money }: { projects: Project[]; money: Money }
   const year = Number(todayInBeirut().slice(0, 4));
   const won = projects.filter((p) => p.status !== "lost");
   const thisYear = won.filter((p) => p.year === year);
-  const signedThisYear = thisYear.reduce((s, p) => s + (p.price_usd ?? 0), 0);
+  const signedThisYear = thisYear.filter((p) => p.price_per === "once").reduce((s, p) => s + (p.price_usd ?? 0), 0);
   const t = totals(money.lines, money.hours);
   const ranges = Object.entries(PROFIT_RANGE)
     .map(([k, label]) => [label, money.private.filter((r) => r.profit_range === k).length] as const)
