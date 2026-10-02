@@ -40,9 +40,8 @@ export default async function ActionQueuePage({ params, searchParams }: PageProp
 
   return (
     <div className="max-w-[880px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">Action queue</h1>
-      <p className="mt-4 max-w-[64ch] text-[17px] leading-relaxed text-muted">
+      <h1 className="page-title">Action queue</h1>
+      <p className="page-intro">
         Each finding comes with what we saw, the evidence and a proposed fix. Nothing changes until someone
         approves it.
       </p>

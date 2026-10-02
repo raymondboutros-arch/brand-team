@@ -16,7 +16,7 @@ export function NameForm({ initial }: { initial: string }) {
         {pending ? "Saving…" : "Save"}
       </button>
       {state.error && <p role="alert" className="w-full text-sm text-danger">{state.error}</p>}
-      {state.ok && <p role="status" className="w-full text-sm text-ok">Saved.</p>}
+      {state.ok && <p role="status" className="w-full text-sm text-ink">Saved.</p>}
     </form>
   );
 }

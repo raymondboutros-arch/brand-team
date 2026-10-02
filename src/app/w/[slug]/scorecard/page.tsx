@@ -45,20 +45,19 @@ export default async function ScorecardPage({ params }: PageProps<"/w/[slug]/sco
 
   return (
     <div className="max-w-[1040px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">Scorecard</h1>
+      <h1 className="page-title">Scorecard</h1>
 
       <section className="mt-8">
         <h2 className="text-[24px] font-semibold tracking-[-0.01em]">{s.goal?.title ?? "The goal"}</h2>
         <Md className="mt-2 text-muted">{s.goal?.body_md}</Md>
         <div className="mt-5 overflow-x-auto rounded-lg border border-line bg-card">
           <table className="w-full text-left text-[15px]">
-            <thead className="bg-wash text-[13px] text-muted">
+            <thead className="text-[13px] text-muted">
               <tr>
-                <th scope="col" className="px-4 py-2.5 font-semibold">Measure</th>
-                <th scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">Now</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line">Measure</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">Now</th>
                 {TARGET_DATES.map((d) => (
-                  <th key={d} scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">
+                  <th key={d} scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">
                     {formatDay(d, { withYear: true })}
                   </th>
                 ))}
@@ -85,11 +84,11 @@ export default async function ScorecardPage({ params }: PageProps<"/w/[slug]/sco
         <Md className="mt-2 text-muted">{s.scorecard?.body_md}</Md>
         <div className="mt-5 overflow-x-auto rounded-lg border border-line bg-card">
           <table className="w-full text-left text-[15px]">
-            <thead className="bg-wash text-[13px] text-muted">
+            <thead className="text-[13px] text-muted">
               <tr>
-                <th scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">Month</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">Month</th>
                 {sc.metrics.map((m) => (
-                  <th key={m.id} scope="col" className="px-4 py-2.5 font-semibold min-w-[11ch]">
+                  <th key={m.id} scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line min-w-[11ch]">
                     {m.label}
                   </th>
                 ))}

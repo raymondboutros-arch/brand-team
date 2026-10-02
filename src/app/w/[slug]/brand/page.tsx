@@ -20,9 +20,8 @@ export default async function BrandPage({ params }: PageProps<"/w/[slug]/brand">
 
   return (
     <div className="max-w-[1040px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">Brand strategy</h1>
-      <Md className="mt-4 text-[17px] text-muted">{s["how-to-read"]?.body_md}</Md>
+      <h1 className="page-title">Brand strategy</h1>
+      <Md className="page-intro">{s["how-to-read"]?.body_md}</Md>
 
       <section id="fixed-lines" className="mt-12 scroll-mt-6">
         <h2 className="text-[24px] font-semibold tracking-[-0.01em]">The lines that never change</h2>
@@ -68,11 +67,11 @@ export default async function BrandPage({ params }: PageProps<"/w/[slug]/brand">
         <h2 className="text-[24px] font-semibold tracking-[-0.01em]">The six steps</h2>
         <div className="mt-5 overflow-x-auto rounded-lg border border-line bg-card">
           <table className="w-full text-left text-[15px]">
-            <thead className="bg-wash text-[13px] text-muted">
+            <thead className="text-[13px] text-muted">
               <tr>
-                <th scope="col" className="px-4 py-2.5 font-semibold">Step</th>
-                <th scope="col" className="px-4 py-2.5 font-semibold">What it settles</th>
-                <th scope="col" className="px-4 py-2.5 font-semibold">Status</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line">Step</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line">What it settles</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">

@@ -57,11 +57,10 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
 
   return (
     <div className="max-w-[1080px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">
+      <h1 className="page-title">
         {greeting()}, <span className="font-serif italic font-normal">{firstName(viewer)}</span>
       </h1>
-      <p className="mt-3 max-w-[64ch] text-muted">
+      <p className="page-intro">
         {daysToLaunch > 0 ? (
           <>
             <span className="text-ink font-medium">{daysToLaunch} days</span> until livbrid.com goes live on 1 December.{" "}

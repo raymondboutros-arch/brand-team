@@ -13,9 +13,8 @@ export default async function ReferencePage({ params }: PageProps<"/w/[slug]/ref
 
   return (
     <div className="max-w-[1040px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">Reference</h1>
-      <Md className="mt-4 text-[17px] text-muted">{byKey.intro?.body_md}</Md>
+      <h1 className="page-title">Reference</h1>
+      <Md className="page-intro">{byKey.intro?.body_md}</Md>
 
       <nav aria-label="On this page" className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-y border-line py-3 text-sm">
         {parts.map((p) => (

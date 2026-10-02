@@ -51,12 +51,12 @@ export function TaskTable({
     </ul>
     <div className="hidden overflow-x-auto rounded-lg border border-line bg-card sm:block">
       <table className="w-full text-left text-[15px]">
-        <thead className="bg-wash text-[13px] text-muted">
+        <thead className="text-[13px] text-muted">
           <tr>
-            <th scope="col" className="px-4 py-2.5 font-semibold">Task</th>
-            <th scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">Owner</th>
-            <th scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">Due</th>
-            <th scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">Status</th>
+            <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line">Task</th>
+            <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">Owner</th>
+            <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">Due</th>
+            <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">Status</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-line">

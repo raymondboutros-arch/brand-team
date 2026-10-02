@@ -23,7 +23,7 @@ export function InviteForm({ slug }: { slug: string }) {
         {pending ? "Inviting…" : "Invite"}
       </button>
       {(state.error || state.ok) && (
-        <p role="status" className={`text-sm sm:col-span-3 ${state.error ? "text-danger" : "text-ok"}`}>
+        <p role="status" className={`text-sm sm:col-span-3 ${state.error ? "text-danger" : "text-ink"}`}>
           {state.error ?? state.ok}
         </p>
       )}

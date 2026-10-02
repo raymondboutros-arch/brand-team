@@ -42,9 +42,8 @@ export default async function PeoplePage({ params }: PageProps<"/w/[slug]/people
 
   return (
     <div className="max-w-[880px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">People</h1>
-      <p className="mt-3 text-muted">Everyone signs in with their own email and two-step sign-in. No shared logins.</p>
+      <h1 className="page-title">People</h1>
+      <p className="page-intro">Everyone signs in with their own email and two-step sign-in. No shared logins.</p>
 
       <section className="mt-8 card overflow-hidden" aria-labelledby="members-h">
         <h2 id="members-h" className="px-5 pt-5 text-lg font-semibold">

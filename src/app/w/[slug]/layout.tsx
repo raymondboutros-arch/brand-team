@@ -4,6 +4,7 @@ import { countWaiting } from "@/lib/actions";
 import { getMyWorkspaces, getViewer, getWorkspace, ROLE_LABEL } from "@/lib/hq";
 import { MODULES } from "@/lib/modules";
 import { NavLink } from "./nav-link";
+import { SearchBox } from "./search-box";
 
 const shortDate = (lands: string) => lands.replace("Friday ", "").replace(/(\d+) (\w{3})\w*/, "$1 $2");
 
@@ -29,7 +30,7 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
         ))}
       </div>
       <div>
-        <p className="eyebrow px-3 mb-1.5 text-paper/45">Coming next</p>
+        <p className="px-3 mb-1 font-serif text-[17px] italic text-paper/55">Coming next</p>
         {MODULES.filter((m) => !m.ready).map((m) => (
           <NavLink key={m.key} href={`${base}/${m.key}`} note={m.lands ? shortDate(m.lands) : undefined}>
             {m.label}
@@ -37,7 +38,7 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
         ))}
       </div>
       <div>
-        <p className="eyebrow px-3 mb-1.5 text-paper/45">Workspace</p>
+        <p className="px-3 mb-1 font-serif text-[17px] italic text-paper/55">Workspace</p>
         <NavLink href={`${base}/people`}>People</NavLink>
         <NavLink href={`${base}/activity`}>Activity</NavLink>
         <NavLink href={`${base}/account`}>Your account</NavLink>
@@ -46,9 +47,9 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
   );
 
   const switcher = (
-    <div className="rounded-md border border-paper/15 px-3 py-2.5">
-      <p className="text-[15px] font-semibold text-paper">{workspace.name}</p>
-      <p className="text-xs text-paper/60">
+    <div className="border-y border-paper/12 px-3 py-3">
+      <p className="text-[15px] font-semibold tracking-[0.01em] text-paper">{workspace.name}</p>
+      <p className="mt-0.5 text-xs text-paper/60">
         {ROLE_LABEL[workspace.role]}
         {all.length > 1 || viewer.isPlatformAdmin ? (
           <>
@@ -63,7 +64,7 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
   );
 
   const footer = (
-    <div className="border-t border-paper/15 pt-4">
+    <div className="border-t border-paper/12 px-3 pt-4">
       <p className="truncate text-sm text-paper">{displayName}</p>
       <form action="/auth/sign-out" method="post">
         <button className="text-xs text-paper/60 underline underline-offset-2 hover:text-paper">Sign out</button>
@@ -75,10 +76,11 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
     <div className="min-h-screen lg:grid lg:grid-cols-[256px_1fr]">
       {/* Desktop sidebar */}
       <div className="hidden lg:block bg-ink">
-        <aside className="sticky top-0 flex h-screen flex-col gap-6 px-4 py-6 overflow-y-auto">
-          <Link href={base} className="px-3">
+        <aside className="sticky top-0 flex h-screen flex-col gap-5 px-4 py-6 overflow-y-auto">
+          <Link href={base} className="px-3 pt-1">
             <Wordmark tone="paper" />
           </Link>
+          <SearchBox slug={workspace.slug} place="side" />
           {switcher}
           <div className="flex-1">{nav}</div>
           {footer}
@@ -95,13 +97,14 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
           </span>
         </summary>
         <div className="flex flex-col gap-6 px-4 pb-6">
+          <SearchBox slug={workspace.slug} place="menu" />
           {switcher}
           {nav}
           {footer}
         </div>
       </details>
 
-      <main className="min-w-0 px-4 py-8 sm:px-8 lg:px-12 lg:py-10">{children}</main>
+      <main className="min-w-0 px-4 py-8 sm:px-8 lg:px-14 lg:py-12">{children}</main>
     </div>
   );
 }

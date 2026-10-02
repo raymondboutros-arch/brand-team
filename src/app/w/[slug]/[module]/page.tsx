@@ -28,8 +28,8 @@ export default async function ModulePage({ params }: PageProps<"/w/[slug]/[modul
   return (
     <div className={section ? "max-w-[1040px]" : "max-w-[720px]"}>
       <p className="eyebrow">Lands {mod.lands}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">{mod.label}</h1>
-      <p className="mt-4 max-w-[64ch] text-[17px] leading-relaxed text-muted">{mod.summary}</p>
+      <h1 className="mt-3 page-title">{mod.label}</h1>
+      <p className="page-intro">{mod.summary}</p>
       {mod.until && (
         <div className="mt-8 max-w-[720px] card p-6">
           <p>

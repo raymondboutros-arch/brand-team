@@ -24,9 +24,8 @@ export default async function ActivityPage({ params }: PageProps<"/w/[slug]/acti
 
   return (
     <div className="max-w-[880px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">Activity</h1>
-      <p className="mt-3 text-muted">
+      <h1 className="page-title">Activity</h1>
+      <p className="page-intro">
         Every change, who made it and when. Changes made through Claude are marked, so the history
         always shows who asked for what.
       </p>

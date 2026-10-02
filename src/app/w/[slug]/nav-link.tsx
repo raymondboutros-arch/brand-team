@@ -22,12 +22,14 @@ export function NavLink({
       href={href}
       aria-current={active ? "page" : undefined}
       onClick={(e) => e.currentTarget.closest("details")?.removeAttribute("open")}
-      className={`flex items-center justify-between rounded-md px-3 h-9 text-[15px] transition-colors ${
-        active ? "bg-paper text-ink font-medium" : "text-paper/80 hover:text-paper hover:bg-paper/10"
+      className={`relative flex items-center justify-between rounded-md px-3 h-9 text-[15px] transition-colors ${
+        active
+          ? "bg-paper/[0.09] text-paper font-medium before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[2px] before:rounded-full before:bg-paper"
+          : "text-paper/70 hover:text-paper hover:bg-paper/[0.05]"
       }`}
     >
       <span>{children}</span>
-      {note && <span className={`text-xs ${active ? "text-muted" : "text-paper/45"}`}>{note}</span>}
+      {note && <span className={`text-xs tabular-nums ${active ? "text-paper/70" : "text-paper/45"}`}>{note}</span>}
     </Link>
   );
 }

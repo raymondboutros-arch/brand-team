@@ -12,13 +12,14 @@ const LABEL: Record<Status, string> = {
 };
 
 export function StatusDot({ status }: { status: Status }) {
+  // Ink only, read like a pie: empty, outlined, half, full.
   const style: Record<Status, string> = {
-    not_started: "border border-line-strong bg-transparent",
-    in_progress: "bg-ink",
-    waiting: "bg-[#a86200]",
-    done: "bg-ok",
+    not_started: "border-[1.5px] border-line-strong",
+    waiting: "border-[1.5px] border-ink",
+    in_progress: "border-[1.5px] border-ink bg-[linear-gradient(90deg,var(--color-ink)_50%,transparent_50%)]",
+    done: "bg-ink",
   };
-  return <span aria-hidden className={`inline-block size-2 shrink-0 rounded-full ${style[status]}`} />;
+  return <span aria-hidden className={`inline-block size-2.5 shrink-0 rounded-full ${style[status]}`} />;
 }
 
 export function StatusPill({ status }: { status: Status }) {

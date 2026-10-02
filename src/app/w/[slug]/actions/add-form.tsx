@@ -74,7 +74,7 @@ export function AddForm({ slug }: { slug: string }) {
           {pending ? "Adding…" : "Add to the queue"}
         </button>
         {(state.error || state.ok) && (
-          <p role="status" className={`text-sm ${state.error ? "text-danger" : "text-ok"}`}>
+          <p role="status" className={`text-sm ${state.error ? "text-danger" : "text-ink"}`}>
             {state.error ?? state.ok}
           </p>
         )}

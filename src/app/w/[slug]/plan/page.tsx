@@ -31,11 +31,10 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
 
   return (
     <div className="max-w-[1040px]">
-      <p className="eyebrow">{workspace.name}</p>
-      <h1 className="mt-2 text-[34px] leading-[1.1] font-semibold tracking-[-0.015em]">
+      <h1 className="page-title">
         {s.intro?.title ?? "Plan"}
       </h1>
-      <Md className="mt-4 text-[17px] text-muted">{s.intro?.body_md}</Md>
+      <Md className="page-intro">{s.intro?.body_md}</Md>
       <p className="mt-4 text-sm text-muted">
         {daysToLaunch > 0 ? `${daysToLaunch} days to launch` : "Launched"} · {openCount} open tasks ·{" "}
         {plan.openDecisions.length} open decisions ·{" "}
@@ -105,8 +104,9 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
         return (
           <section key={w.id} id={`ws-${w.number}`} className="mt-14 scroll-mt-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-[24px] font-semibold tracking-[-0.01em]">
-                {w.number}. {w.title}
+              <h2 className="flex items-baseline gap-3 text-[24px] font-semibold tracking-[-0.01em]">
+                <span className="ref-mark text-[32px] leading-none">{w.number}</span>
+                <span>{w.title}</span>
               </h2>
               <p className="text-sm text-muted">
                 {done} of {tasks.length} done
@@ -126,10 +126,10 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
         <p className="mt-2 text-muted">Decisions already made, newest first.</p>
         <div className="mt-5 overflow-x-auto rounded-lg border border-line bg-card">
           <table className="w-full text-left text-[15px]">
-            <thead className="bg-wash text-[13px] text-muted">
+            <thead className="text-[13px] text-muted">
               <tr>
-                <th scope="col" className="px-4 py-2.5 font-semibold">Decision</th>
-                <th scope="col" className="px-4 py-2.5 font-semibold whitespace-nowrap">Date</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line">Decision</th>
+                <th scope="col" className="px-4 pt-3 pb-2.5 font-medium border-b border-line whitespace-nowrap">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
