@@ -59,8 +59,9 @@ by the database from the header; findings start as waiting and only a person app
 ## Build order (version 1)
 
 Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference, imported from
-the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct). Next: Channels (23 Oct) · Content and Projects
-(30 Oct) · Proposals (6 Nov) · Visibility, with Search Console and the Claude connector (13 Nov).
+the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct); Projects with Owner-only money, hours and
+profit (2 Oct, planned for 30 Oct). Next: Channels (23 Oct) · Content (30 Oct) · Proposals (6 Nov) · Visibility,
+with Search Console and the Claude connector (13 Nov).
 Module list: `src/lib/modules.ts`.
 
 Projects, Proposals and Visibility come from Ray's list of 1 October; the spec section

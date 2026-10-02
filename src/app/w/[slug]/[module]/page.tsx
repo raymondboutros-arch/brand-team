@@ -21,6 +21,7 @@ export default async function ModulePage({ params }: PageProps<"/w/[slug]/[modul
   const mod = findModule(key);
   if (!mod || mod.ready) notFound();
   const workspace = await getWorkspace(slug);
+  if (mod.studioOnly && !workspace.isStudio) notFound();
 
   const refKey = mod.until?.path.startsWith("reference#") ? mod.until.path.slice("reference#".length) : null;
   const section = refKey ? (await getSections(workspace.id, "reference")).byKey[refKey] : undefined;

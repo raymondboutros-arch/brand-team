@@ -11,6 +11,8 @@ export type Module = {
   ready: boolean;
   /** Where this information lives in HQ until the module ships (path inside the workspace). */
   until?: { text: string; path: string; label: string };
+  /** Runs the studio itself: shown only in the studio's own workspace (LIVBRID), never in a client's. */
+  studioOnly?: boolean;
 };
 
 export const MODULES: Module[] = [
@@ -65,10 +67,9 @@ export const MODULES: Module[] = [
     key: "projects",
     label: "Projects",
     summary:
-      "Every project from signed to closed: brief and real need, deliverables, timeline, price, and the close-out answers, so the next audit is already filled. Payments, outside costs, hours and profit are for the Owner only. Starts with the 30 projects and the lost pitches from the audit sheet.",
-    lands: "Friday 30 October",
-    ready: false,
-    until: { text: "Until it lands, the audit findings are in", label: "Reference", path: "reference#project-audit" },
+      "Every project from signed to closed: brief and real need, deliverables, timeline, price, and the close-out facts. Payments, outside costs, hours and profit are for the Owner only.",
+    ready: true,
+    studioOnly: true,
   },
   {
     key: "proposals",
@@ -78,6 +79,7 @@ export const MODULES: Module[] = [
     lands: "Friday 6 November",
     ready: false,
     until: { text: "Until it lands, the prices and timeline are D1 to D3 in the", label: "decision log", path: "plan#decision-log" },
+    studioOnly: true,
   },
   {
     key: "visibility",
@@ -87,9 +89,15 @@ export const MODULES: Module[] = [
     lands: "Friday 13 November",
     ready: false,
     until: { text: "Until it lands, the Google and AI baseline is in", label: "Reference", path: "reference#ai-visibility" },
+    studioOnly: true,
   },
 ];
 
 export function findModule(key: string) {
   return MODULES.find((m) => m.key === key);
+}
+
+/** The modules a workspace shows: studio modules only in the studio's own workspace. */
+export function modulesFor(isStudio: boolean) {
+  return MODULES.filter((m) => isStudio || !m.studioOnly);
 }

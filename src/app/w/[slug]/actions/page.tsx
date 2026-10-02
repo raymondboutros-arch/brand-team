@@ -11,7 +11,7 @@ import {
 } from "@/lib/actions";
 import { dayInBeirut, formatDay, todayInBeirut } from "@/lib/dates";
 import { AddForm } from "./add-form";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "@/components/submit-button";
 import { decideAction, moveAction } from "./mutations";
 
 export const metadata: Metadata = { title: "Action queue" };

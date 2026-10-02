@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Search across one workspace: plan and strategy notes, Reference, tasks, decisions,
- * workstreams, the Action queue, the fixed brand lines and the Scorecard.
+ * workstreams, the Action queue, the fixed brand lines, the Scorecard and, in the studio's own
+ * workspace, Projects.
  * Runs as the signed-in person, so row level security decides what they can find.
  */
 
@@ -16,13 +17,14 @@ export type Hit = {
   href: string; // path inside the workspace, e.g. "plan#ws-4"
 };
 
-export type Kind = "page" | "task" | "decision" | "workstream" | "action" | "line" | "metric";
+export type Kind = "page" | "task" | "decision" | "workstream" | "action" | "project" | "line" | "metric";
 
 export const KIND_LABEL: Record<Kind, string> = {
   page: "Pages",
   decision: "Decisions",
   task: "Tasks",
   action: "Action queue",
+  project: "Projects",
   workstream: "Workstreams",
   line: "Brand lines",
   metric: "Scorecard",
@@ -39,6 +41,14 @@ const STATUS_NAME: Record<string, string> = {
   dismissed: "Dismissed",
   open: "Open",
   decided: "Decided",
+};
+
+const PROJECT_STATUS: Record<string, string> = {
+  signed: "Signed",
+  in_progress: "In progress",
+  delivered: "Delivered",
+  closed: "Closed",
+  lost: "Lost pitch",
 };
 
 /** Words worth searching for: no PostgREST syntax characters, at most five words. */
@@ -88,7 +98,7 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
   const supabase = await createClient();
   const LIMIT = 25;
 
-  const [sections, tasks, decisions, workstreams, actions, lines, metrics] = await Promise.all([
+  const [sections, tasks, decisions, workstreams, actions, projects, lines, metrics] = await Promise.all([
     allTerms(
       supabase.from("sections").select("id, area, key, title, body_md").eq("workspace_id", workspaceId),
       ["title", "body_md"],
@@ -115,6 +125,15 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
     allTerms(
       supabase.from("actions").select("id, number, title, finding, fix, status").eq("workspace_id", workspaceId),
       ["title", "finding", "fix", "owner"],
+      terms,
+    ).limit(LIMIT),
+    // Only the studio's Owner and Team can read projects; for anyone else this returns nothing.
+    allTerms(
+      supabase
+        .from("projects")
+        .select("id, number, client, sector, brief, real_need, deliverables, notes, status")
+        .eq("workspace_id", workspaceId),
+      ["client", "sector", "brief", "real_need", "deliverables", "notes"],
       terms,
     ).limit(LIMIT),
     allTerms(
@@ -178,6 +197,17 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
       meta: STATUS_NAME[a.status],
       snippet: snippetFor(plain([a.finding, a.fix].filter(Boolean).join(" ")), terms),
       href: `actions${a.status === "waiting" ? "" : `?show=${a.status}`}#a${a.number}`,
+    });
+  }
+  for (const p of projects.data ?? []) {
+    hits.push({
+      id: p.id,
+      kind: "project",
+      title: p.client,
+      mark: `P${p.number}`,
+      meta: [p.sector, PROJECT_STATUS[p.status]].filter(Boolean).join(", "),
+      snippet: snippetFor(plain([p.deliverables, p.brief, p.real_need, p.notes].filter(Boolean).join(" ")), terms),
+      href: `projects/${p.number}`,
     });
   }
   for (const w of workstreams.data ?? []) {

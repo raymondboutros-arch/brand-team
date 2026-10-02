@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Wordmark } from "@/components/wordmark";
 import { countWaiting } from "@/lib/actions";
 import { getMyWorkspaces, getViewer, getWorkspace, ROLE_LABEL } from "@/lib/hq";
-import { MODULES } from "@/lib/modules";
+import { modulesFor } from "@/lib/modules";
 import { NavLink } from "./nav-link";
 import { SearchBox } from "./search-box";
 
@@ -14,12 +14,13 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
   const waiting = await countWaiting(workspace.id);
   const base = `/w/${workspace.slug}`;
   const displayName = viewer.name ?? viewer.email;
+  const modules = modulesFor(workspace.isStudio);
 
   const nav = (
     <nav aria-label="Workspace" className="flex flex-col gap-6">
       <div>
         <NavLink href={base} exact>Overview</NavLink>
-        {MODULES.filter((m) => m.ready).map((m) => (
+        {modules.filter((m) => m.ready).map((m) => (
           <NavLink
             key={m.key}
             href={`${base}/${m.key}`}
@@ -31,7 +32,7 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
       </div>
       <div>
         <p className="px-3 mb-1 font-serif text-[17px] italic text-paper/55">Coming next</p>
-        {MODULES.filter((m) => !m.ready).map((m) => (
+        {modules.filter((m) => !m.ready).map((m) => (
           <NavLink key={m.key} href={`${base}/${m.key}`} note={m.lands ? shortDate(m.lands) : undefined}>
             {m.label}
           </NavLink>

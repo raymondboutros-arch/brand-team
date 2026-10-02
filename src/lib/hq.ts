@@ -40,7 +40,7 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   };
 });
 
-export type WorkspaceSummary = { id: string; slug: string; name: string; role: Role };
+export type WorkspaceSummary = { id: string; slug: string; name: string; role: Role; isStudio: boolean };
 
 /** Workspaces the viewer belongs to. Row level security filters the list. */
 export const getMyWorkspaces = cache(async (): Promise<WorkspaceSummary[]> => {
@@ -48,14 +48,14 @@ export const getMyWorkspaces = cache(async (): Promise<WorkspaceSummary[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("members")
-    .select("role, workspaces!inner(id, slug, name)")
+    .select("role, workspaces!inner(id, slug, name, is_studio)")
     .eq("user_id", viewer.id)
     .order("created_at", { ascending: true });
   if (error) throw error;
 
   return (data ?? []).map((row) => {
-    const ws = row.workspaces as unknown as { id: string; slug: string; name: string };
-    return { id: ws.id, slug: ws.slug, name: ws.name, role: row.role as Role };
+    const ws = row.workspaces as unknown as { id: string; slug: string; name: string; is_studio: boolean };
+    return { id: ws.id, slug: ws.slug, name: ws.name, role: row.role as Role, isStudio: ws.is_studio === true };
   });
 });
 
