@@ -83,7 +83,7 @@ export const MODULES: Module[] = [
     key: "visibility",
     label: "Visibility",
     summary:
-      "Where LIVBRID stands on Google, in AI answers and on other sites: Search Console, the 20-prompt AI check and Ahrefs, saved every Monday, with a check-now button. Search Console and the Claude connector are connected here.",
+      "Where LIVBRID stands on Google, in AI answers and on other sites: Search Console, the 30-prompt AI check and Ahrefs, saved every Monday, with a check-now button. Search Console and the Claude connector are connected here.",
     lands: "Friday 13 November",
     ready: false,
     until: { text: "Until it lands, the Google and AI baseline is in", label: "Reference", path: "reference#ai-visibility" },
