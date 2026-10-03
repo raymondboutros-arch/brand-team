@@ -258,3 +258,111 @@ a.link:hover,
 .md tr:first-child td {
   border-top: 0;
 }
+
+/* ---------------------------------------------------------------------------------------
+   Charts. Drawn in ink and greys (blue stays for the one primary button per screen).
+   Status ramp, validated (ordinal, light): done #111111, in progress #5C5952,
+   waiting #8A867D; not started is the track, #E4E2DC.
+   One tooltip pattern for every mark, on hover and on keyboard focus.
+   --------------------------------------------------------------------------------------- */
+.viz-tip {
+  position: relative;
+  outline: none;
+}
+.viz-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translate(-50%, 3px);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0;
+  padding: 5px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+  z-index: 30;
+}
+.viz-tip[data-tip-align="start"]::after {
+  left: 0;
+  transform: translate(0, 3px);
+}
+.viz-tip[data-tip-align="end"]::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, 3px);
+}
+.viz-tip:hover::after,
+.viz-tip:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.viz-tip[data-tip-align="start"]:hover::after,
+.viz-tip[data-tip-align="start"]:focus-visible::after,
+.viz-tip[data-tip-align="end"]:hover::after,
+.viz-tip[data-tip-align="end"]:focus-visible::after {
+  transform: translate(0, 0);
+}
+.viz-tip:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-paper), 0 0 0 4px var(--color-blue);
+}
+.viz-mark {
+  transition: opacity 0.12s ease;
+}
+.viz-mark:hover,
+.viz-mark:focus-visible {
+  opacity: 0.72;
+}
+
+/* The one moment of motion: when a page opens, bars and rings draw in, once.
+   Nothing moves for people who ask their device for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .viz-reveal {
+    animation: viz-reveal 0.9s cubic-bezier(0.22, 0.7, 0.2, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+  .viz-rise {
+    transform-origin: bottom;
+    animation: viz-rise 0.7s cubic-bezier(0.22, 0.7, 0.2, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+  .viz-ring {
+    animation: viz-ring 1.1s cubic-bezier(0.22, 0.7, 0.2, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+  .viz-fade {
+    animation: viz-fade 0.6s ease backwards;
+    animation-delay: var(--d, 0ms);
+  }
+}
+@keyframes viz-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes viz-rise {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes viz-ring {
+  from {
+    stroke-dashoffset: var(--full);
+  }
+}
+@keyframes viz-fade {
+  from {
+    opacity: 0;
+  }
+}

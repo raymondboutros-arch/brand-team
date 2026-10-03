@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/hq";
+import { Columns, TONE } from "@/components/viz";
 import { formatDay } from "@/lib/dates";
 import {
   ASSISTANTS,
@@ -172,7 +173,12 @@ function GoogleSection({ weeks, lastWeek }: { weeks: GoogleWeek[]; lastWeek?: Go
               {lastWeek.avg_position ?? "unknown"}: page {Math.ceil((lastWeek.avg_position ?? 10) / 10)} of the results.
             </p>
           )}
-          <div className="mt-5 overflow-x-auto">
+          <WeekCharts weeks={[...weeks].reverse()} />
+          <details className="mt-6">
+            <summary className="btn-quiet cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+              Show the numbers week by week
+            </summary>
+          <div className="mt-3 overflow-x-auto">
             <table className="hq-table w-full min-w-[640px] text-left text-[15px]">
               <thead>
                 <tr>
@@ -208,6 +214,7 @@ function GoogleSection({ weeks, lastWeek }: { weeks: GoogleWeek[]; lastWeek?: Go
               </tbody>
             </table>
           </div>
+          </details>
           {weeks.some((w) => w.note) && (
             <p className="mt-2 text-[13px] text-muted">{weeks.find((w) => w.note)?.note}</p>
           )}
@@ -283,7 +290,9 @@ function AiSection({ run, answers }: { run: { label: string; checked_on: string;
         <span className="text-muted">{run.note}</span>
       </p>
 
-      <div className="mt-5 overflow-x-auto">
+      <Matrix answers={answers} prompts={prompts} />
+
+      <div className="mt-10 overflow-x-auto">
         <table className="hq-table w-full min-w-[640px] text-left text-[15px]">
           <thead>
             <tr>
@@ -425,5 +434,139 @@ function AiSection({ run, answers }: { run: { label: string; checked_on: string;
         );
       })}
     </>
+  );
+}
+
+const MONTHS_LONG = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/** Two small charts side by side (never one chart with two scales): clicks, and appearances. */
+function WeekCharts({ weeks }: { weeks: GoogleWeek[] }) {
+  const pts = (pick: (w: GoogleWeek) => number) =>
+    weeks.map((w, i) => {
+      const m = Number(w.week_of.slice(5, 7)) - 1;
+      const newMonth = i === 0 || w.week_of.slice(5, 7) !== weeks[i - 1].week_of.slice(5, 7);
+      return {
+        key: w.week_of,
+        label: `week of ${formatDay(w.week_of)}${w.days < 7 ? ` (${w.days} days)` : ""}`,
+        short: newMonth ? MONTHS_LONG[m] : "",
+        value: pick(w),
+      };
+    });
+  const first = weeks[0];
+  const last = weeks[weeks.length - 1];
+  const range = first && last ? `${formatDay(first.week_of)} to ${formatDay(last.week_of)}` : "";
+  return (
+    <div className="mt-6 grid gap-6 md:grid-cols-2">
+      <div className="rounded-2xl border border-line bg-card p-5">
+        <p className="text-[15px] font-semibold">Clicks each week</p>
+        <p className="mb-5 text-[13px] text-muted">People who came to livbrid.com from Google</p>
+        <Columns points={pts((w) => w.clicks)} unit={["click", "clicks"]} label={`Clicks per week, ${range}`} />
+      </div>
+      <div className="rounded-2xl border border-line bg-card p-5">
+        <p className="text-[15px] font-semibold">Appearances each week</p>
+        <p className="mb-5 text-[13px] text-muted">Times livbrid.com showed in Google results</p>
+        <Columns points={pts((w) => w.impressions)} unit={["appearance", "appearances"]} label={`Appearances per week, ${range}`} />
+      </div>
+    </div>
+  );
+}
+
+type Cell = "good" | "partly" | "no" | "none";
+const CELL_STYLE: Record<Cell, React.CSSProperties> = {
+  good: { background: TONE.ink },
+  partly: { background: TONE.soft },
+  no: { background: TONE.track },
+  none: { background: "transparent", boxShadow: "inset 0 0 0 1px #CFCCC4" },
+};
+const CELL_LABEL: Record<Cell, string> = {
+  good: "Named us, or answered right",
+  partly: "Partly right",
+  no: "Did not name us, or got it wrong",
+  none: "Not asked yet",
+};
+
+/** Every prompt against every assistant, one square each: the whole check at a glance. */
+function Matrix({ answers, prompts }: { answers: AiAnswer[]; prompts: { no: number; prompt: string; kind: AiAnswer["kind"] }[] }) {
+  const groups = (["discovery", "brand", "language"] as const)
+    .map((k) => ({ kind: k, items: prompts.filter((p) => p.kind === k) }))
+    .filter((g) => g.items.length > 0);
+  const state = (no: number, as: string): { cell: Cell; text: string } => {
+    const list = answers.filter((a) => a.prompt_no === no && a.assistant === as);
+    if (list.length === 0) return { cell: "none", text: "not asked yet" };
+    const text = cell(list) ?? "";
+    if (list.some((a) => (a.kind === "brand" ? a.verdict === "accurate" : a.named))) return { cell: "good", text };
+    if (list.some((a) => a.verdict === "partly")) return { cell: "partly", text };
+    return { cell: "no", text };
+  };
+  const total = prompts.length;
+  return (
+    <figure className="mt-6 rounded-2xl border border-line bg-card p-5 sm:p-6">
+      <figcaption className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <span className="text-[15px] font-semibold">Every answer at a glance</span>
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-muted" aria-label="Legend">
+          {(Object.keys(CELL_LABEL) as Cell[]).map((c) => (
+            <li key={c} className="flex items-center gap-1.5">
+              <span aria-hidden className="size-3 rounded-[3px]" style={CELL_STYLE[c]} />
+              {CELL_LABEL[c]}
+            </li>
+          ))}
+        </ul>
+      </figcaption>
+      <div className="mt-5 overflow-x-auto pb-1">
+        <div className="inline-grid gap-y-[3px]" style={{ gridTemplateColumns: "128px auto" }}>
+          <span />
+          <div className="flex gap-4 pb-1 text-[11px] text-faint">
+            {groups.map((g) => (
+              <span key={g.kind} style={{ width: g.items.length * 19 - 3 }} className="truncate">
+                {g.kind === "discovery" ? "Buyers looking" : g.kind === "brand" ? "About us" : "Arabic, French"}
+              </span>
+            ))}
+          </div>
+          {ASSISTANTS.map((as, row) => (
+            <div key={as} className="contents">
+              <span className="pr-3 text-[13px] leading-4">{ASSISTANT_LABEL[as]}</span>
+              <div className="flex gap-4">
+                {groups.map((g) => (
+                  <div key={g.kind} className="flex gap-[3px]">
+                    {g.items.map((p) => {
+                      const st = state(p.no, as);
+                      const idx = p.no;
+                      return (
+                        <span
+                          key={p.no}
+                          tabIndex={0}
+                          data-tip={`${p.no}. ${ASSISTANT_LABEL[as]}: ${st.text}`}
+                          data-tip-align={idx <= 6 ? "start" : idx > total - 6 ? "end" : undefined}
+                          className="viz-tip viz-mark viz-fade block size-4 rounded-[3px]"
+                          style={{ ...CELL_STYLE[st.cell], ["--d" as string]: `${row * 60 + idx * 12}ms` }}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          <span />
+          <div className="flex gap-4 pt-1 text-[11px] tabular-nums text-faint" aria-hidden>
+            {groups.map((g) => (
+              <div key={g.kind} className="flex gap-[3px]">
+                {g.items.map((p) => (
+                  <span key={p.no} className="w-4 text-center">
+                    {p.no === g.items[0].no || p.no === g.items[g.items.length - 1].no ? p.no : ""}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <p className="mt-3 text-[13px] text-muted">
+        Hover or tab to a square to see the answer. The table below has the same results in words.
+      </p>
+    </figure>
   );
 }

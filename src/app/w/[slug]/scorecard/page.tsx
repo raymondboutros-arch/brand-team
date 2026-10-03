@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Md } from "@/components/markdown";
+import { TargetBar } from "@/components/viz";
 import { getWorkspace } from "@/lib/hq";
 import { formatDay, formatMonth, todayInBeirut } from "@/lib/dates";
 import { AUTO_FROM, AUTO_METRICS, getScorecard, getScorecardAuto, getSections } from "@/lib/plan";
@@ -7,6 +8,14 @@ import { AUTO_FROM, AUTO_METRICS, getScorecard, getScorecardAuto, getSections } 
 export const metadata: Metadata = { title: "Scorecard" };
 
 const TARGET_DATES = ["2026-12-31", "2027-03-31", "2027-06-30"];
+const TARGET_SHORT: Record<string, string> = { "2026-12-31": "December", "2027-03-31": "March", "2027-06-30": "June" };
+
+/** The number at the start of a value ("6 (Google 6, Clutch 0)" is 6), or null for words. */
+function num(v: string | null | undefined) {
+  if (!v) return null;
+  const m = v.trim().match(/^-?\d+(\.\d+)?/);
+  return m ? Number(m[0]) : null;
+}
 
 /** Placeholders written as [fill] show as quiet text, so real numbers stand out. */
 function Value({ v }: { v: string | undefined | null }) {
@@ -66,7 +75,39 @@ export default async function ScorecardPage({ params }: PageProps<"/w/[slug]/sco
       <section className="mt-8">
         <h2 className="text-[24px] font-semibold tracking-[-0.01em]">{s.goal?.title ?? "The goal"}</h2>
         <Md className="mt-2 text-muted">{s.goal?.body_md}</Md>
-        <div className="mt-5 overflow-x-auto rounded-lg border border-line bg-card">
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {goals.map((m, i) => {
+            const nowValue = num(now(m));
+            const marks = TARGET_DATES.map((d) => ({ label: TARGET_SHORT[d], value: num(target(m.id, d)) })).filter(
+              (t): t is { label: string; value: number } => t.value !== null,
+            );
+            return (
+              <li key={m.id} className="flex flex-col justify-between gap-4 rounded-2xl border border-line bg-card p-5">
+                <p className="text-[14px] leading-snug text-muted">{m.goal_label}</p>
+                <div>
+                  <p className="text-[36px] font-semibold leading-none tracking-[-0.03em]">
+                    {nowValue ?? <span className="text-[15px] font-normal text-faint">Not measured yet</span>}
+                    {nowValue !== null && marks.length > 0 && (
+                      <span className="text-[15px] font-normal text-muted">
+                        {" "}
+                        of {marks[marks.length - 1].value} by {marks[marks.length - 1].label}
+                      </span>
+                    )}
+                  </p>
+                  {nowValue !== null && marks.length > 0 && (
+                    <div className="mt-4">
+                      <TargetBar now={nowValue} targets={marks} label={m.goal_label ?? m.label} delay={100 + i * 80} />
+                      <p className="mt-2.5 text-[12px] text-faint">
+                        {marks.map((t) => `${t.value} by ${t.label}`).join(", ")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="mt-6 overflow-x-auto rounded-lg border border-line bg-card">
           <table className="w-full text-left text-[15px]">
             <thead className="text-[13px] text-muted">
               <tr>

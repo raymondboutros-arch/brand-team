@@ -5,7 +5,8 @@ import { RoadmapChart } from "@/components/roadmap-chart";
 import { TaskTable } from "@/components/task-table";
 import { getWorkspace } from "@/lib/hq";
 import { daysBetween, formatDay, todayInBeirut } from "@/lib/dates";
-import { getPlan, getSections } from "@/lib/plan";
+import { countStatuses, getPlan, getSections } from "@/lib/plan";
+import { Ring, StatusBar, StatusLegend } from "@/components/viz";
 import { setTaskStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Plan" };
@@ -27,7 +28,7 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
     byWorkstream.set(t.workstream_id, [...(byWorkstream.get(t.workstream_id) ?? []), t]);
   }
   const daysToLaunch = daysBetween(today, LAUNCH);
-  const openCount = plan.tasks.filter((t) => t.status !== "done").length;
+  const all = countStatuses(plan.tasks);
 
   return (
     <div className="max-w-[1040px]">
@@ -35,11 +36,31 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
         {s.intro?.title ?? "Plan"}
       </h1>
       <Md className="page-intro">{s.intro?.body_md}</Md>
-      <p className="mt-4 text-sm text-muted">
-        {daysToLaunch > 0 ? `${daysToLaunch} days to launch` : "Launched"} · {openCount} open tasks ·{" "}
-        {plan.openDecisions.length} open decisions ·{" "}
-        <Link href={`/w/${slug}/scorecard`} className="link">The 2027 goal and scorecard</Link>
-      </p>
+      <section
+        aria-label="Progress"
+        className="mt-8 grid items-center gap-x-8 gap-y-5 rounded-2xl border border-line bg-card p-6 sm:grid-cols-[auto_1fr]"
+      >
+        <Ring value={all.done} total={plan.tasks.length} size={96} label="Tasks done" />
+        <div className="min-w-0">
+          <p className="text-[17px]">
+            <span className="font-semibold">{all.done} of {plan.tasks.length} tasks done.</span>{" "}
+            <span className="text-muted">
+              {all.in_progress} in progress, {all.waiting} waiting, {all.not_started} not started.{" "}
+              {daysToLaunch > 0 ? `${daysToLaunch} days to launch, ` : ""}
+              {plan.openDecisions.length} open {plan.openDecisions.length === 1 ? "decision" : "decisions"}.
+            </span>
+          </p>
+          <div className="mt-4">
+            <StatusBar counts={all} label="All tasks" height={10} delay={100} />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <StatusLegend />
+            <Link href={`/w/${slug}/scorecard`} className="link text-sm">
+              The 2027 goal and scorecard
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <nav aria-label="On this page" className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-y border-line py-3 text-sm">
         <a href="#this-week" className="link">This week</a>
@@ -100,7 +121,7 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
 
       {plan.workstreams.map((w) => {
         const tasks = byWorkstream.get(w.id) ?? [];
-        const done = tasks.filter((t) => t.status === "done").length;
+        const counts = countStatuses(tasks);
         return (
           <section key={w.id} id={`ws-${w.number}`} className="mt-14 scroll-mt-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -109,8 +130,11 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
                 <span>{w.title}</span>
               </h2>
               <p className="text-sm text-muted">
-                {done} of {tasks.length} done
+                {counts.done} of {tasks.length} done
               </p>
+            </div>
+            <div className="mt-3 max-w-[560px]">
+              <StatusBar counts={counts} label={`Workstream ${w.number}`} height={6} />
             </div>
             <Md className="mt-2 text-muted">{w.summary_md}</Md>
             {w.extra_md && <Md className="mt-4">{w.extra_md}</Md>}

@@ -222,6 +222,16 @@ export const getBrandLines = cache(async (workspaceId: string) => {
   };
 });
 
+/** How many tasks sit in each status. */
+export function countStatuses(tasks: Pick<Task, "status">[]) {
+  return {
+    done: tasks.filter((t) => t.status === "done").length,
+    in_progress: tasks.filter((t) => t.status === "in_progress").length,
+    waiting: tasks.filter((t) => t.status === "waiting").length,
+    not_started: tasks.filter((t) => t.status === "not_started").length,
+  };
+}
+
 /** Task is late if its date has passed and it isn't done. */
 export function isLate(task: Pick<Task, "due_on" | "status">, today: string) {
   return Boolean(task.due_on && task.due_on < today && task.status !== "done");
