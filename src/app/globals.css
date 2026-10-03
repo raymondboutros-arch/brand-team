@@ -265,9 +265,12 @@ a.link:hover,
    waiting #8A867D; not started is the track, #E4E2DC.
    One tooltip pattern for every mark, on hover and on keyboard focus.
    --------------------------------------------------------------------------------------- */
-.viz-tip {
-  position: relative;
-  outline: none;
+/* In a layer, so a mark placed with Tailwind's `absolute` keeps it (unlayered CSS would win). */
+@layer components {
+  .viz-tip {
+    position: relative;
+    outline: none;
+  }
 }
 .viz-tip::after {
   content: attr(data-tip);
