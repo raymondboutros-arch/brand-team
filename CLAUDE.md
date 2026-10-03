@@ -29,7 +29,7 @@ LIVBRID is the first workspace, Pro Ink the second. The product spec lives in th
    activity log records who changed what. Requests from the Claude connector send the header
    `x-hq-via: claude` and are logged as "through Claude".
 7. **Brand identity.** Black `#111111`, LIVBRID blue `#2447E0`, paper `#FAFAF7`. HQ's second
-   palette (decided 3 Oct, option B "cobalt and saffron"): sky `#8EA6F2`, saffron `#E9A23B`, sky
+   palette, for HQ only (decided 3 Oct, option B "cobalt and saffron"; livbrid.com stays black, blue and paper): sky `#8EA6F2`, saffron `#E9A23B`, sky
    wash `#EEF1FD`, sand wash `#FBF3E4`. Cobalt marks progress and done, sky marks in progress and
    history, saffron marks what needs someone (waiting, high impact), the sand wash tints a card
    that needs attention. One blue *button* per screen. Colour lives in marks, never in text: links
