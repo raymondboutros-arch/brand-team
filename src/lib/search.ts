@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Search across one workspace: plan and strategy notes, Reference, tasks, decisions,
- * workstreams, the Action queue, the fixed brand lines, the Scorecard and, in the studio's own
+ * workstreams, the Action queue, Channels, the fixed brand lines, the Scorecard and, in the studio's own
  * workspace, Projects.
  * Runs as the signed-in person, so row level security decides what they can find.
  */
@@ -23,6 +23,7 @@ export type Kind =
   | "decision"
   | "workstream"
   | "action"
+  | "channel"
   | "project"
   | "proposal"
   | "enquiry"
@@ -34,6 +35,7 @@ export const KIND_LABEL: Record<Kind, string> = {
   decision: "Decisions",
   task: "Tasks",
   action: "Action queue",
+  channel: "Channels",
   project: "Projects",
   proposal: "Proposals",
   enquiry: "Enquiries",
@@ -61,6 +63,14 @@ const PROJECT_STATUS: Record<string, string> = {
   delivered: "Delivered",
   closed: "Closed",
   lost: "Lost pitch",
+};
+
+const CHANNEL_STATUS: Record<string, string> = {
+  to_check: "Not checked",
+  needs_update: "Needs update",
+  up_to_date: "Up to date",
+  to_claim: "To claim",
+  to_close: "To close",
 };
 
 const SALES_STATUS: Record<string, string> = {
@@ -120,7 +130,7 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
   const supabase = await createClient();
   const LIMIT = 25;
 
-  const [sections, tasks, decisions, workstreams, actions, projects, proposals, enquiries, lines, metrics] = await Promise.all([
+  const [sections, tasks, decisions, workstreams, actions, projects, proposals, enquiries, lines, metrics, channels] = await Promise.all([
     allTerms(
       supabase.from("sections").select("id, area, key, title, body_md").eq("workspace_id", workspaceId),
       ["title", "body_md"],
@@ -181,6 +191,14 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
       ["label", "goal_label"],
       terms,
     ).limit(LIMIT),
+    allTerms(
+      supabase
+        .from("channels")
+        .select("id, platform, shown_name, handle, url, owner, note, status")
+        .eq("workspace_id", workspaceId),
+      ["platform", "shown_name", "handle", "url", "owner", "login_email", "note"],
+      terms,
+    ).limit(LIMIT),
   ]);
 
   const wsNumber = new Map<string, number>();
@@ -232,6 +250,16 @@ export async function searchHQ(workspaceId: string, q: string): Promise<{ terms:
       meta: STATUS_NAME[a.status],
       snippet: snippetFor(plain([a.finding, a.fix].filter(Boolean).join(" ")), terms),
       href: `actions${a.status === "waiting" ? "" : `?show=${a.status}`}#a${a.number}`,
+    });
+  }
+  for (const c of channels.data ?? []) {
+    hits.push({
+      id: c.id,
+      kind: "channel",
+      title: [c.platform, c.shown_name].filter(Boolean).join(", "),
+      meta: [c.owner, CHANNEL_STATUS[c.status]].filter(Boolean).join(", "),
+      snippet: snippetFor(plain([c.note, c.handle, c.url].filter(Boolean).join(" ")), terms),
+      href: `channels#ch-${c.id}`,
     });
   }
   for (const p of projects.data ?? []) {

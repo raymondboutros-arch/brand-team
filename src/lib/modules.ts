@@ -50,10 +50,9 @@ export const MODULES: Module[] = [
   {
     key: "channels",
     label: "Channels",
-    summary: "Every account: platform, username, link, owner, two-step sign-in on or off, and connection status. No passwords.",
-    lands: "Friday 23 October",
-    ready: false,
-    until: { text: "Until it lands, the five channels and their owners are in", label: "Plan, workstream 5", path: "plan#ws-5" },
+    summary:
+      "Every account: platform, username, link, who looks after it, the login email, two-step sign-in, the password manager and what needs updating. No passwords.",
+    ready: true,
   },
   {
     key: "content",

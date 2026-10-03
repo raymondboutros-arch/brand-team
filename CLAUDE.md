@@ -74,7 +74,8 @@ Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference,
 the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct); Projects with Owner-only money, hours and
 profit (2 Oct, planned for 30 Oct); Proposals with the price list, enquiries and the PDF (2 Oct, planned for
 6 Nov); Visibility with 13 weeks of Search Console and the AI baseline (3 Oct; the direct Search Console
-connection, Check now and the Claude connector stay on 13 Nov). Next: Channels (23 Oct) · Content (30 Oct).
+connection, Check now and the Claude connector stay on 13 Nov); Channels (3 Oct, planned for 23 Oct: every account with its
+owner, login email, two-step and password manager flags, no password column; platform connections come later). Next: Content (30 Oct).
 Prices live only in the database (`price_list`), never in a migration file: the repo may be public.
 Module list: `src/lib/modules.ts`.
 
