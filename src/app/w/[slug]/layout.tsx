@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/wordmark";
 import { countWaiting } from "@/lib/actions";
+import { countToApprove } from "@/lib/content";
 import { getMyWorkspaces, getViewer, getWorkspace, ROLE_LABEL } from "@/lib/hq";
 import { modulesFor } from "@/lib/modules";
 import { CommandPalette } from "./command";
@@ -13,7 +14,12 @@ const shortDate = (lands: string) => lands.replace("Friday ", "").replace(/(\d+)
 export default async function WorkspaceLayout({ children, params }: LayoutProps<"/w/[slug]">) {
   const { slug } = await params;
   const [viewer, workspace, all] = await Promise.all([getViewer(), getWorkspace(slug), getMyWorkspaces()]);
-  const waiting = await countWaiting(workspace.id);
+  const [waiting, toApprove] = await Promise.all([countWaiting(workspace.id), countToApprove(workspace.id)]);
+  const canApprove = workspace.role === "owner" || workspace.role === "client_approver";
+  const navNote: Record<string, { note: string; attention: boolean } | undefined> = {
+    actions: waiting > 0 ? { note: `${waiting} waiting`, attention: true } : undefined,
+    content: toApprove > 0 ? { note: `${toApprove} to approve`, attention: canApprove } : undefined,
+  };
   const base = `/w/${workspace.slug}`;
   const displayName = viewer.name ?? viewer.email;
   const modules = modulesFor(workspace.isStudio);
@@ -45,21 +51,23 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
           <NavLink
             key={m.key}
             href={`${base}/${m.key}`}
-            note={m.key === "actions" && waiting > 0 ? `${waiting} waiting` : undefined}
-            attention={m.key === "actions" && waiting > 0}
+            note={navNote[m.key]?.note}
+            attention={navNote[m.key]?.attention ?? false}
           >
             {m.label}
           </NavLink>
         ))}
       </div>
-      <div>
-        <p className="px-3 mb-1 font-serif text-[17px] italic text-paper/55">Coming next</p>
-        {modules.filter((m) => !m.ready).map((m) => (
-          <NavLink key={m.key} href={`${base}/${m.key}`} note={m.lands ? shortDate(m.lands) : undefined}>
-            {m.label}
-          </NavLink>
-        ))}
-      </div>
+      {modules.some((m) => !m.ready) && (
+        <div>
+          <p className="px-3 mb-1 font-serif text-[17px] italic text-paper/55">Coming next</p>
+          {modules.filter((m) => !m.ready).map((m) => (
+            <NavLink key={m.key} href={`${base}/${m.key}`} note={m.lands ? shortDate(m.lands) : undefined}>
+              {m.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
       <div>
         <p className="px-3 mb-1 font-serif text-[17px] italic text-paper/55">Workspace</p>
         <NavLink href={`${base}/people`}>People</NavLink>

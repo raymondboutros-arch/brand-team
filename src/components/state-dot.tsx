@@ -30,3 +30,4 @@ export const PROJECT_STATE = { signed: "moving", in_progress: "moving", delivere
 export const PROPOSAL_STATE = { draft: "needs", approved: "moving", sent: "moving", won: "done", lost: "closed" } as const;
 export const ENQUIRY_STATE = { open: "needs", won: "done", lost: "closed", declined: "closed" } as const;
 export const CHANNEL_STATE = { needs_update: "needs", to_claim: "needs", to_close: "needs", to_check: "closed", up_to_date: "done" } as const;
+export const CONTENT_STATE = { idea: "closed", draft: "moving", approved: "moving", scheduled: "moving", live: "done", dropped: "closed" } as const;

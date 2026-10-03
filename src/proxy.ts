@@ -45,6 +45,10 @@ export async function proxy(request: NextRequest) {
   const signedIn = Boolean(data?.claims);
   const path = request.nextUrl.pathname;
 
+  // A draft's review link opens for anyone who holds it, signed in or not. The database decides
+  // what it shows: one draft, by its 64-character token, and nothing else.
+  if (startsWithAny(path, ["/review"])) return response;
+
   // If Supabase falls back to the Site URL, the sign-in code lands on the home page.
   // Hand it to the callback instead of losing it.
   if (path === "/" && request.nextUrl.searchParams.has("code")) {

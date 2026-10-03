@@ -57,10 +57,9 @@ export const MODULES: Module[] = [
   {
     key: "content",
     label: "Content",
-    summary: "Idea bank and calendar. Each item moves from idea to draft, approved, scheduled and live, with a review link on every draft.",
-    lands: "Friday 30 October",
-    ready: false,
-    until: { text: "Until it lands, the launch articles are tracked in", label: "Plan, workstream 4", path: "plan#ws-4" },
+    summary:
+      "Idea bank and calendar. Each item moves from idea to draft, approved, scheduled and live, with a review link on every draft. The team drafts, the Owner approves.",
+    ready: true,
   },
   {
     key: "projects",

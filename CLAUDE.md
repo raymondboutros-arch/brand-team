@@ -64,6 +64,13 @@ Proposals follow the same rule: Claude may draft `our_thinking` (marked `thinkin
 database refuses an approval that comes through Claude. Close a proposal with `select public.close_proposal(id,
 'won' | 'lost', said, think)` so the project is created with it.
 
+Content: add an idea by inserting into `public.content_items` (workspace_id, title, format, series, channel_id, owner,
+due_on, brief, fact; stage 'idea' or 'draft'). The number (C1, C2...), `source = 'claude'` and the review token are set by
+the database. Claude may write `body_md` and send a draft for approval (`review_requested_at`), but the database refuses
+an approval through Claude, and only the Owner or a client approver can approve. Changing approved words sends it back
+to draft. The review link `/review/<token>` opens one draft or approved item, read only, through
+`public.content_for_review()`, the only function anon can call.
+
 Visibility is filled through Claude until the connections land: a finished week of Search Console goes in
 `visibility_google` (week_of is a Monday; brand searches are those containing livbrid or creative couple), and an AI
 check is one `visibility_ai_runs` row with one `visibility_ai_answers` row per prompt, assistant and attempt.
@@ -75,7 +82,9 @@ the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct); Projects wit
 profit (2 Oct, planned for 30 Oct); Proposals with the price list, enquiries and the PDF (2 Oct, planned for
 6 Nov); Visibility with 13 weeks of Search Console and the AI baseline (3 Oct; the direct Search Console
 connection, Check now and the Claude connector stay on 13 Nov); Channels (3 Oct, planned for 23 Oct: every account with its
-owner, login email, two-step and password manager flags, no password column; platform connections come later). Next: Content (30 Oct).
+owner, login email, two-step and password manager flags, no password column; platform connections come later); Content (3 Oct,
+planned for 30 Oct: idea bank, board and calendar, review links). Version 1 modules are all in; next are the 13 Nov
+connections (Search Console, Check now, the Claude connector).
 Prices live only in the database (`price_list`), never in a migration file: the repo may be public.
 Module list: `src/lib/modules.ts`.
 

@@ -5,7 +5,7 @@ import { KIND_LABEL, searchHQ, type Hit, type Kind } from "@/lib/search";
 
 export const metadata: Metadata = { title: "Search" };
 
-const ORDER: Kind[] = ["page", "project", "proposal", "enquiry", "decision", "action", "channel", "task", "workstream", "line", "metric"];
+const ORDER: Kind[] = ["page", "project", "proposal", "enquiry", "decision", "action", "content", "channel", "task", "workstream", "line", "metric"];
 
 /** Wraps every search word in the text in a <mark>. */
 function Highlight({ text, terms }: { text: string; terms: string[] }) {
