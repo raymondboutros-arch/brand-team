@@ -89,10 +89,9 @@ export default async function ChannelsPage({ params, searchParams }: PageProps<"
               Sign-in
             </p>
             <p className="mt-1 text-[15px] leading-relaxed text-muted">
-              Two-step sign-in is on for {count.twoStepOn}
-              {count.twoStepOff > 0 ? `, off for ${count.twoStepOff}` : ""}. {count.inVault} in the password manager.
-              {count.safetyUnknown > 0 &&
-                ` Not filled in on ${count.safetyUnknown}: open each one and add the login email, two-step sign-in and the password manager.`}
+              {count.safetyUnknown === count.all
+                ? `Not filled in yet on any of the ${count.all}. Open each one and add the login email, whether two-step sign-in is on and whether the login is in the password manager.`
+                : `Two-step sign-in is on for ${count.twoStepOn}${count.twoStepOff > 0 ? ` and off for ${count.twoStepOff}` : ""}. ${count.inVault} ${count.inVault === 1 ? "login is" : "logins are"} in the password manager.${count.safetyUnknown > 0 ? ` Still to fill in on ${count.safetyUnknown}.` : ""}`}
             </p>
           </div>
         </div>
@@ -185,9 +184,12 @@ function ChannelRow({
     <details id={`ch-${c.id}`} className="group scroll-mt-6 border-b border-line last:border-b-0 target:bg-sky-wash">
       <summary className="grid cursor-pointer list-none gap-x-4 gap-y-1.5 px-4 py-3.5 text-[15px] hover:bg-wash md:grid-cols-[minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,0.6fr)_minmax(0,0.8fr)_minmax(0,0.9fr)] [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
+          <span aria-hidden className="mr-1.5 inline-block w-2 text-faint transition-transform group-open:rotate-90">
+            ›
+          </span>
           <span className="font-semibold">{c.platform}</span>
           {name && <span className="text-muted">, {name}</span>}
-          {c.note && <span className="mt-0.5 block truncate text-[13px] text-muted group-open:hidden">{c.note}</span>}
+          {c.note && <span className="mt-0.5 block truncate pl-3.5 text-[13px] text-muted group-open:hidden">{c.note}</span>}
         </span>
         <span className="min-w-0 truncate text-sm">
           {c.url ? (
