@@ -126,7 +126,7 @@ function ActionCard({
       <p className="font-serif text-[28px] italic leading-none">A{a.number}</p>
       <div className="mt-2 min-w-0 sm:mt-0">
         <h2 className="text-[17px] font-semibold leading-snug">{a.title}</h2>
-        <p className="mt-1.5 flex flex-wrap items-center gap-x-1 text-[13px] text-muted">
+        <p className="mt-1.5 flex flex-wrap items-center text-[13px] text-muted">
           <StateTag state={ACTION_STATE[a.status]}>
             <span className="text-ink">{ACTION_STATUS_LABEL[a.status]}</span>
           </StateTag>

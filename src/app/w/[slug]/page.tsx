@@ -413,9 +413,11 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
             {(activity ?? []).map((a) => (
               <li key={a.id} className="py-3">
                 <span className="line-clamp-2">{a.summary}</span>
-                <span className="mt-0.5 block text-[13px] text-faint">
+                <span className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-faint">
                   {formatWhen(a.created_at)}
-                  {a.via === "claude" ? ", through Claude" : ""}
+                  {a.via === "claude" && (
+                    <span className="rounded-full bg-sky-wash px-2 py-px text-[12px] text-ink">through Claude</span>
+                  )}
                 </span>
               </li>
             ))}
