@@ -23,7 +23,7 @@ export default async function ContentPage({ params, searchParams }: PageProps<"/
   const view: View = rawView === "calendar" || rawView === "dropped" ? rawView : "board";
 
   const workspace = await getWorkspace(slug);
-  const { items, channels, channelName } = await getContent(workspace.id);
+  const { items, channels } = await getContent(workspace.id);
   const canEdit = workspace.role === "owner" || workspace.role === "team";
   const canApprove = workspace.role === "owner" || workspace.role === "client_approver";
   const base = `/w/${slug}/content`;
@@ -92,7 +92,7 @@ export default async function ContentPage({ params, searchParams }: PageProps<"/
         ))}
       </nav>
 
-      {view === "board" && <Board items={active} base={base} today={today} channelName={channelName} />}
+      {view === "board" && <Board items={active} base={base} today={today} />}
       {view === "calendar" && <Calendar items={active} base={base} today={today} rawMonth={rawMonth} />}
       {view === "dropped" &&
         (dropped.length === 0 ? (
@@ -128,23 +128,11 @@ function isLate(i: ContentItem, today: string) {
   return false;
 }
 
-function Card({
-  i,
-  base,
-  today,
-  channelName,
-}: {
-  i: ContentItem;
-  base: string;
-  today: string;
-  channelName: Map<string, string>;
-}) {
+function Card({ i, base, today }: { i: ContentItem; base: string; today: string }) {
   const wait = waitingForApproval(i);
   const late = isLate(i, today);
   const when = whenLine(i, today);
-  const kind = [FORMAT_LABEL[i.format], i.series, i.channel_id ? channelName.get(i.channel_id) : null]
-    .filter(Boolean)
-    .join(", ");
+  const kind = i.series ?? FORMAT_LABEL[i.format];
   return (
     <li>
       <Link
@@ -177,17 +165,7 @@ function Card({
   );
 }
 
-function Board({
-  items,
-  base,
-  today,
-  channelName,
-}: {
-  items: ContentItem[];
-  base: string;
-  today: string;
-  channelName: Map<string, string>;
-}) {
+function Board({ items, base, today }: { items: ContentItem[]; base: string; today: string }) {
   if (items.length === 0) {
     return <p className="mt-6 text-muted">No ideas yet. Add the first one: a question an owner asked you this month is a good start.</p>;
   }
@@ -207,7 +185,7 @@ function Board({
             ) : (
               <ul className="mt-3 grid gap-2">
                 {list.map((i) => (
-                  <Card key={i.id} i={i} base={base} today={today} channelName={channelName} />
+                  <Card key={i.id} i={i} base={base} today={today} />
                 ))}
               </ul>
             )}

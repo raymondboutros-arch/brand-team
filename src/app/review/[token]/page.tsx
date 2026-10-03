@@ -58,7 +58,7 @@ export default async function ReviewPage({ params }: PageProps<"/review/[token]"
             <h1 className="mt-4 text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] sm:text-[42px]">{draft.title}</h1>
             <article className="mt-10">
               {draft.body_md?.trim() ? (
-                <Md className="text-[17px] leading-[1.7]">{draft.body_md}</Md>
+                <Md className="md-read">{draft.body_md}</Md>
               ) : (
                 <p className="text-muted">The text hasn&apos;t been written yet.</p>
               )}

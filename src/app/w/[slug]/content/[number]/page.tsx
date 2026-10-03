@@ -310,7 +310,7 @@ export default async function ContentItemPage({ params }: PageProps<"/w/[slug]/c
       {canEdit && c.stage !== "live" && (
         <details className="mt-10" open={c.stage === "draft" && !hasText}>
           <summary className="btn btn-secondary w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-            {hasText ? "Edit the draft and details" : "Write the draft"}
+            {c.stage === "idea" ? "Edit the idea" : hasText ? "Edit the draft and details" : "Write the draft"}
           </summary>
           <div className="card mt-3 p-5 sm:p-6">
             <ContentForm

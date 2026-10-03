@@ -126,6 +126,13 @@ a.link:hover,
 .md > * + * {
   margin-top: 0.9em;
 }
+.md h2 {
+  margin-top: 2em;
+  font-size: 23px;
+  line-height: 1.25;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
 .md h3 {
   margin-top: 2em;
   font-size: 19px;
@@ -539,4 +546,10 @@ a.link:hover,
 .palette-input:focus,
 .palette-input:focus-visible {
   outline: none;
+}
+
+/* A draft opened by its review link: set for reading. */
+.md.md-read {
+  font-size: 18px;
+  line-height: 1.7;
 }
