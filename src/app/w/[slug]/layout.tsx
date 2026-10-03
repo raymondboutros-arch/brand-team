@@ -3,8 +3,10 @@ import { Wordmark } from "@/components/wordmark";
 import { countWaiting } from "@/lib/actions";
 import { getMyWorkspaces, getViewer, getWorkspace, ROLE_LABEL } from "@/lib/hq";
 import { modulesFor } from "@/lib/modules";
+import { CommandPalette } from "./command";
 import { NavLink } from "./nav-link";
 import { SearchBox } from "./search-box";
+import { TopBar } from "./top-bar";
 
 const shortDate = (lands: string) => lands.replace("Friday ", "").replace(/(\d+) (\w{3})\w*/, "$1 $2");
 
@@ -15,6 +17,25 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
   const base = `/w/${workspace.slug}`;
   const displayName = viewer.name ?? viewer.email;
   const modules = modulesFor(workspace.isStudio);
+  const ready = modules.filter((m) => m.ready);
+  const extras = [
+    { key: "people", label: "People" },
+    { key: "activity", label: "Activity" },
+    { key: "account", label: "Your account" },
+    { key: "search", label: "Search" },
+  ];
+  // Page names for the top bar, and the "Go to" list of the search palette.
+  const titles: Record<string, string> = {
+    "": "Overview",
+    ...Object.fromEntries(modules.map((m) => [m.key, m.label])),
+    ...Object.fromEntries(extras.map((e) => [e.key, e.label])),
+  };
+  const pages = [
+    { label: "Overview", href: base },
+    ...ready.map((m) => ({ label: m.label, href: `${base}/${m.key}` })),
+    ...modules.filter((m) => !m.ready).map((m) => ({ label: m.label, href: `${base}/${m.key}`, note: m.lands ? `Lands ${shortDate(m.lands)}` : undefined })),
+    ...extras.filter((e) => e.key !== "search").map((e) => ({ label: e.label, href: `${base}/${e.key}` })),
+  ];
 
   const nav = (
     <nav aria-label="Workspace" className="flex flex-col gap-6">
@@ -88,16 +109,16 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
         </aside>
       </div>
 
-      {/* Phone and tablet */}
-      <details className="lg:hidden group bg-ink text-paper">
-        <summary className="flex items-center justify-between px-4 h-14 cursor-pointer list-none">
+      {/* Phone and tablet: a dark glass bar that stays on top; the menu opens over the page. */}
+      <details className="group sticky top-0 z-40 text-paper lg:hidden">
+        <summary className="glass-dark flex h-14 cursor-pointer list-none items-center justify-between px-4 [&::-webkit-details-marker]:hidden">
           <Wordmark tone="paper" />
           <span className="text-sm text-paper/80">
             <span className="group-open:hidden">Menu</span>
             <span className="hidden group-open:inline">Close</span>
           </span>
         </summary>
-        <div className="flex flex-col gap-6 px-4 pb-6">
+        <div className="glass-dark absolute inset-x-0 top-14 flex max-h-[calc(100dvh-3.5rem)] flex-col gap-6 overflow-y-auto border-t border-paper/10 px-4 pb-8 pt-4">
           <SearchBox slug={workspace.slug} place="menu" />
           {switcher}
           {nav}
@@ -105,7 +126,11 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
         </div>
       </details>
 
-      <main className="min-w-0 px-4 py-8 sm:px-8 lg:px-14 lg:py-12">{children}</main>
+      <div className="min-w-0">
+        <TopBar slug={workspace.slug} workspace={workspace.name} titles={titles} />
+        <main className="min-w-0 px-4 py-8 sm:px-8 lg:px-14 lg:pb-14 lg:pt-3">{children}</main>
+      </div>
+      <CommandPalette slug={workspace.slug} pages={pages} />
     </div>
   );
 }

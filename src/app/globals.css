@@ -414,3 +414,124 @@ a.link:hover,
     transform: translateY(8px);
   }
 }
+
+/* ---------------------------------------------------------------------------------------
+   Glass, used only on layers that float over moving content: the top bar once the page
+   scrolls, the search palette, and the phone menu. Cards and charts stay solid.
+   People who ask for less transparency, and browsers without blur, get solid surfaces.
+   --------------------------------------------------------------------------------------- */
+.glass {
+  background: rgba(250, 250, 247, 0.78);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  backdrop-filter: blur(28px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 1px 2px rgba(17, 17, 17, 0.06),
+    0 30px 70px -28px rgba(17, 17, 17, 0.45);
+}
+.glass-bar {
+  background: rgba(250, 250, 247, 0.72);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+  box-shadow: inset 0 -1px 0 rgba(17, 17, 17, 0.08);
+}
+.glass-dark {
+  background: rgba(17, 17, 17, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+.top-bar {
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.palette-backdrop {
+  background: rgba(17, 17, 17, 0.22);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-bar {
+    background: var(--color-paper);
+  }
+  .glass-dark {
+    background: var(--color-ink);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-bar,
+  .palette-backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass,
+  .glass-bar {
+    background: var(--color-paper);
+  }
+  .glass-dark {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--color-ink);
+  }
+}
+
+/* Arrivals: each page settles in, the palette drops in. Nothing moves on request. */
+@media (prefers-reduced-motion: no-preference) {
+  .page-in {
+    animation: page-in 0.4s cubic-bezier(0.22, 0.7, 0.2, 1) backwards;
+  }
+  .palette-in {
+    animation: palette-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  .palette-spinner {
+    animation: spin 0.8s linear infinite;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading outline: shows only after a short wait, so quick pages never flash. */
+.loading-shell {
+  animation: loading-show 0.2s ease 0.25s backwards;
+}
+.skeleton {
+  background: #efede7;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    background: linear-gradient(90deg, #efede7 0%, #f6f5f1 45%, #efede7 90%);
+    background-size: 220% 100%;
+    animation: skeleton 1.4s ease-in-out infinite;
+  }
+}
+@keyframes loading-show {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes skeleton {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
