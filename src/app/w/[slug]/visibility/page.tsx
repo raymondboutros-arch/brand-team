@@ -383,7 +383,9 @@ function AiSection({ run, answers }: { run: { label: string; checked_on: string;
                           <details>
                             <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                               <span className="ref-mark mr-2 text-[16px]">{p.no}</span>
-                              <span className="underline decoration-line-strong underline-offset-4">{p.prompt}</span>
+                              <span dir="auto" className="underline decoration-line-strong underline-offset-4">
+                                {p.prompt}
+                              </span>
                             </summary>
                             <ul className="mt-2 grid gap-1.5 text-[13px] leading-relaxed text-muted">
                               {notes.map((a) => (
@@ -399,7 +401,7 @@ function AiSection({ run, answers }: { run: { label: string; checked_on: string;
                         ) : (
                           <>
                             <span className="ref-mark mr-2 text-[16px]">{p.no}</span>
-                            {p.prompt}
+                            <span dir="auto">{p.prompt}</span>
                           </>
                         )}
                       </td>
