@@ -12,12 +12,12 @@ const LABEL: Record<Status, string> = {
 };
 
 export function StatusDot({ status }: { status: Status }) {
-  // Ink only, read like a pie: empty, outlined, half, full.
+  // The HQ palette: cobalt done, sky in progress, saffron waiting on someone, an empty ring not started.
   const style: Record<Status, string> = {
     not_started: "border-[1.5px] border-line-strong",
-    waiting: "border-[1.5px] border-ink",
-    in_progress: "border-[1.5px] border-ink bg-[linear-gradient(90deg,var(--color-ink)_50%,transparent_50%)]",
-    done: "bg-ink",
+    waiting: "bg-saffron",
+    in_progress: "bg-sky",
+    done: "bg-blue",
   };
   return <span aria-hidden className={`inline-block size-2.5 shrink-0 rounded-full ${style[status]}`} />;
 }

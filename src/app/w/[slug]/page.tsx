@@ -178,7 +178,7 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
           </div>
         </Tile>
 
-        <Tile href={`${base}/actions`} label="Waiting for a decision" delay={120}>
+        <Tile href={`${base}/actions`} label="Waiting for a decision" delay={120} attention={waiting.length > 0}>
           <div className="flex items-end justify-between gap-3">
             <p className="text-[44px] font-semibold leading-none tracking-[-0.03em]">
               <CountUp value={waiting.length} delay={300} />
@@ -190,7 +190,8 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
                 label={`Waiting findings by impact: ${waiting.map((a) => `A${a.number} ${IMPACT_LABEL[a.impact].toLowerCase()}`).join(", ")}`}
                 items={waiting.slice(0, 10).map((a) => ({
                   key: a.id,
-                  on: a.impact === "high",
+                  on: true,
+                  tone: a.impact === "high" ? ("saffron" as const) : ("sky" as const),
                   tip: `A${a.number}, ${IMPACT_LABEL[a.impact].toLowerCase()}: ${a.title}`,
                 }))}
               />
@@ -199,7 +200,7 @@ export default async function OverviewPage({ params }: PageProps<"/w/[slug]">) {
           <p className="mt-2 text-[13px] text-muted">
             {waiting.length === 0
               ? "Nothing in the action queue"
-              : `${waiting.filter((a) => a.impact === "high").length} high impact (dark squares), ${waiting.filter((a) => a.source === "claude").length} from Claude`}
+              : `${waiting.filter((a) => a.impact === "high").length} high impact (saffron), ${waiting.filter((a) => a.source === "claude").length} from Claude`}
           </p>
         </Tile>
 
@@ -439,18 +440,23 @@ function Tile({
   href,
   label,
   delay = 0,
+  attention = false,
   children,
 }: {
   href: string;
   label: string;
   delay?: number;
+  /** Something here needs a person: the card takes the sand wash. */
+  attention?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
       style={{ ["--d" as string]: `${delay}ms` }}
-      className="rise-in group flex flex-col justify-between gap-4 rounded-[20px] border border-line bg-card p-5 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-ink hover:shadow-[0_10px_30px_-18px_rgba(17,17,17,0.35)]"
+      className={`rise-in group flex flex-col justify-between gap-4 rounded-[20px] border p-5 ${
+        attention ? "border-sand-line bg-sand" : "border-line bg-card"
+      } transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-ink hover:shadow-[0_10px_30px_-18px_rgba(17,17,17,0.35)]`}
     >
       <p className="text-[13px] font-medium text-muted group-hover:text-ink">{label}</p>
       <div>{children}</div>

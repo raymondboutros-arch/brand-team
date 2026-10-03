@@ -211,7 +211,7 @@ function GoogleSection({ weeks, lastWeek }: { weeks: GoogleWeek[]; lastWeek?: Go
                         <span className="w-[3.5ch] shrink-0 text-right">{n(w.impressions)}</span>
                         <span
                           aria-hidden
-                          className="h-1.5 rounded-full bg-ink/80"
+                          className="h-1.5 rounded-full bg-sky"
                           style={{ width: `${Math.max(2, (w.impressions / max) * 100) * 0.6}%` }}
                         />
                       </span>
@@ -484,8 +484,8 @@ function WeekCharts({ weeks }: { weeks: GoogleWeek[] }) {
 
 type Cell = "good" | "partly" | "no" | "none";
 const CELL_STYLE: Record<Cell, React.CSSProperties> = {
-  good: { background: TONE.ink },
-  partly: { background: TONE.soft },
+  good: { background: TONE.cobalt },
+  partly: { background: TONE.sky },
   no: { background: TONE.track },
   none: { background: "transparent", boxShadow: "inset 0 0 0 1px #CFCCC4" },
 };

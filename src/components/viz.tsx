@@ -1,5 +1,6 @@
 /**
- * HQ's charts: small, server-rendered, in ink and greys. Every mark has a tooltip on hover and
+ * HQ's charts: small and server-rendered, in the HQ palette (cobalt for progress, sky for
+ * history and work in progress, saffron for what needs someone). Every mark has a tooltip on hover and
  * keyboard focus, and every number is also written out somewhere on the page (tooltips never
  * gate a value). Motion is one draw-in when the page opens; see globals.css.
  */
@@ -9,14 +10,17 @@ export const TONE = {
   mid: "#5C5952",
   soft: "#8A867D",
   track: "#E4E2DC",
+  cobalt: "#2447E0",
+  sky: "#8EA6F2",
+  saffron: "#E9A23B",
 } as const;
 
 export type StatusCounts = { done: number; in_progress: number; waiting: number; not_started: number };
 
 const STATUS_PARTS: { key: keyof StatusCounts; label: string; color: string }[] = [
-  { key: "done", label: "done", color: TONE.ink },
-  { key: "in_progress", label: "in progress", color: TONE.mid },
-  { key: "waiting", label: "waiting", color: TONE.soft },
+  { key: "done", label: "done", color: TONE.cobalt },
+  { key: "in_progress", label: "in progress", color: TONE.sky },
+  { key: "waiting", label: "waiting", color: TONE.saffron },
   { key: "not_started", label: "not started", color: TONE.track },
 ];
 
@@ -105,7 +109,7 @@ export function Ring({
             cy={size / 2}
             r={r}
             fill="none"
-            stroke={TONE.ink}
+            stroke={TONE.cobalt}
             strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={c}
@@ -135,7 +139,7 @@ export function Meter({ value, max, label, delay = 0 }: { value: number; max: nu
           data-tip={`${value} of ${max}`}
           data-tip-align="start"
           className="viz-tip viz-reveal block h-full rounded-[4px]"
-          style={{ width: `${share * 100}%`, minWidth: 6, background: TONE.ink, ["--d" as string]: `${delay}ms` }}
+          style={{ width: `${share * 100}%`, minWidth: 6, background: TONE.cobalt, ["--d" as string]: `${delay}ms` }}
         />
       )}
     </div>
@@ -164,8 +168,8 @@ export function Sparkline({
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label} className="viz-fade overflow-visible">
       <line x1={pad} x2={width - pad} y1={height - pad} y2={height - pad} stroke={TONE.track} strokeWidth={1} />
-      <polyline points={pts} fill="none" stroke={TONE.soft} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={x(last)} cy={y(values[last])} r={4} fill={TONE.ink} stroke="#ffffff" strokeWidth={2} />
+      <polyline points={pts} fill="none" stroke={TONE.sky} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx={x(last)} cy={y(values[last])} r={4} fill={TONE.cobalt} stroke="#ffffff" strokeWidth={2} />
     </svg>
   );
 }
@@ -208,7 +212,7 @@ export function Columns({
                   className="viz-tip viz-mark viz-rise block w-full max-w-[24px] rounded-t-[4px]"
                   style={{
                     height: p.value > 0 ? `${Math.max(3, (p.value / top) * 100)}%` : 2,
-                    background: p.value > 0 ? TONE.ink : TONE.track,
+                    background: p.value > 0 ? TONE.cobalt : TONE.track,
                     ["--d" as string]: `${i * 35}ms`,
                   }}
                 />
@@ -254,7 +258,7 @@ export function TargetBar({
       {now > 0 && (
         <span
           className="viz-reveal absolute inset-y-0 left-0 rounded-[4px]"
-          style={{ width: `${(now / max) * 100}%`, minWidth: 6, background: TONE.ink, ["--d" as string]: `${delay}ms` }}
+          style={{ width: `${(now / max) * 100}%`, minWidth: 6, background: TONE.cobalt, ["--d" as string]: `${delay}ms` }}
         />
       )}
       {targets.map((t, i) => (
@@ -293,7 +297,7 @@ export function SquareGrid({
   columns = 10,
   size = 14,
 }: {
-  items: { key: string; on: boolean; tip: string }[];
+  items: { key: string; on: boolean; tip: string; tone?: "cobalt" | "sky" | "saffron" }[];
   label: string;
   columns?: number;
   size?: number;
@@ -315,7 +319,7 @@ export function SquareGrid({
           style={{
             width: size,
             height: size,
-            background: it.on ? TONE.ink : TONE.track,
+            background: it.tone ? TONE[it.tone] : it.on ? TONE.cobalt : TONE.track,
             ["--d" as string]: `${150 + i * 25}ms`,
           }}
         />
@@ -350,7 +354,7 @@ export function MiniColumns({
             className="viz-tip viz-mark viz-rise block w-[7px] rounded-t-[2px]"
             style={{
               height: p.value > 0 ? `${Math.max(12, (p.value / max) * 100)}%` : 2,
-              background: p.value === 0 ? TONE.track : last ? TONE.ink : TONE.soft,
+              background: p.value === 0 ? TONE.track : last ? TONE.cobalt : TONE.sky,
               ["--d" as string]: `${200 + i * 40}ms`,
             }}
           />
@@ -386,7 +390,7 @@ export function HBars({
                 width: `${(r.value / max) * 100}%`,
                 minWidth: r.value > 0 ? 4 : 0,
                 maxWidth: "calc(100% - 3ch)",
-                background: TONE.ink,
+                background: TONE.cobalt,
                 ["--d" as string]: `${120 + i * 60}ms`,
               }}
             />

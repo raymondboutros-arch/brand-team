@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 /* LIVBRID identity, decided 30 Sep 2026: black, LIVBRID blue, paper.
-   Rules: one blue element per screen, links stay black and underlined,
-   blue is a fill with white text, never text on black. */
+   HQ's second palette, decided 3 Oct 2026 (option B): cobalt and saffron.
+   Cobalt (the LIVBRID blue) marks progress and done, sky marks work in progress and history,
+   saffron marks what needs someone. Washes tint a card that needs attention.
+   Rules: one blue button per screen, links stay black and underlined, text stays ink
+   (colour lives in marks, never in words), blue is a fill with white text. */
 @theme {
   --color-ink: #111111;
   --color-paper: #fafaf7;
@@ -15,6 +18,11 @@
   --color-blue: #2447e0;
   --color-blue-dark: #1a36b8;
   --color-danger: #b42318;
+  --color-sky: #8ea6f2;
+  --color-saffron: #e9a23b;
+  --color-sky-wash: #eef1fd;
+  --color-sand: #fbf3e4;
+  --color-sand-line: #f0dfbf;
 
   --font-sans: "Schibsted Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Instrument Serif", ui-serif, Georgia, serif;

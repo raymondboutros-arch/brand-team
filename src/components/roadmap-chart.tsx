@@ -56,7 +56,7 @@ export function RoadmapChart({ items, today }: { items: RoadmapItem[]; today: st
           {items.map((it, i) => {
             const y = TOP + i * ROW + ROW / 2;
             const one = it.starts_on === it.ends_on;
-            const color = it.highlight ? "#2447E0" : "#3d3a35";
+            const color = it.highlight ? "#2447E0" : "#8EA6F2";
             const dates = one
               ? formatDay(it.starts_on, { withYear: true })
               : `${formatDay(it.starts_on, { withYear: true })} to ${formatDay(it.ends_on, { withYear: true })}`;

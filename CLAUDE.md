@@ -28,9 +28,13 @@ LIVBRID is the first workspace, Pro Ink the second. The product spec lives in th
 6. **Everything is logged.** Add `private.log_change()`-style triggers for new tables so the
    activity log records who changed what. Requests from the Claude connector send the header
    `x-hq-via: claude` and are logged as "through Claude".
-7. **Brand identity.** Black `#111111`, LIVBRID blue `#2447E0`, paper `#FAFAF7`. One blue
-   element per screen (the primary button). Links stay black and underlined. Blue is a fill with
-   white text, never text on black. Type: Schibsted Grotesk, Instrument Serif italic for accents.
+7. **Brand identity.** Black `#111111`, LIVBRID blue `#2447E0`, paper `#FAFAF7`. HQ's second
+   palette (decided 3 Oct, option B "cobalt and saffron"): sky `#8EA6F2`, saffron `#E9A23B`, sky
+   wash `#EEF1FD`, sand wash `#FBF3E4`. Cobalt marks progress and done, sky marks in progress and
+   history, saffron marks what needs someone (waiting, high impact), the sand wash tints a card
+   that needs attention. One blue *button* per screen. Colour lives in marks, never in text: links
+   stay black and underlined. Blue is a fill with white text, never text on black. Type: Schibsted
+   Grotesk, Instrument Serif italic for accents.
 8. **Writing.** Plain language, no em dashes, written like an experienced agency, not software.
 
 ## Database changes
