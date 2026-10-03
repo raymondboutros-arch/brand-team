@@ -116,7 +116,9 @@ export function Ring({
         )}
       </svg>
       <span className="absolute inset-0 grid place-items-center text-[19px] font-semibold tracking-[-0.01em]">
-        {pct}%
+        <span>
+          <CountUp value={pct} delay={delay} />%
+        </span>
       </span>
     </div>
   );
@@ -270,5 +272,128 @@ export function TargetBar({
         />
       ))}
     </div>
+  );
+}
+
+/** A whole number that counts up from zero when the page opens (CSS only; see globals.css). */
+export function CountUp({ value, delay = 0 }: { value: number; delay?: number }) {
+  const n = Math.max(0, Math.round(value));
+  return (
+    <>
+      <span aria-hidden className="count-up" style={{ ["--num" as string]: n, ["--d" as string]: `${delay}ms` }} />
+      <span className="sr-only">{n}</span>
+    </>
+  );
+}
+
+/** A count of a whole as squares: one square per item, filled when it counts. */
+export function SquareGrid({
+  items,
+  label,
+  columns = 10,
+  size = 14,
+}: {
+  items: { key: string; on: boolean; tip: string }[];
+  label: string;
+  columns?: number;
+  size?: number;
+}) {
+  return (
+    <div
+      role="img"
+      aria-label={label}
+      className="grid w-fit gap-[3px]"
+      style={{ gridTemplateColumns: `repeat(${columns}, ${size}px)` }}
+    >
+      {items.map((it, i) => (
+        <span
+          key={it.key}
+          tabIndex={0}
+          data-tip={it.tip}
+          data-tip-align={i % columns < 3 ? "start" : i % columns > columns - 4 ? "end" : undefined}
+          className="viz-tip viz-mark viz-fade block rounded-[3px]"
+          style={{
+            width: size,
+            height: size,
+            background: it.on ? TONE.ink : TONE.track,
+            ["--d" as string]: `${150 + i * 25}ms`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Small columns for a tile: the latest in ink, the history in grey (emphasis on now). */
+export function MiniColumns({
+  points,
+  unit,
+  height = 40,
+  label,
+}: {
+  points: { key: string; label: string; value: number }[];
+  unit: [string, string];
+  height?: number;
+  label: string;
+}) {
+  const max = Math.max(1, ...points.map((p) => p.value));
+  return (
+    <div role="img" aria-label={label} className="flex items-end gap-[3px]" style={{ height }}>
+      {points.map((p, i) => {
+        const last = i === points.length - 1;
+        return (
+          <span
+            key={p.key}
+            tabIndex={0}
+            data-tip={`${p.value} ${p.value === 1 ? unit[0] : unit[1]}, ${p.label}`}
+            data-tip-align={i < 3 ? "start" : i > points.length - 4 ? "end" : undefined}
+            className="viz-tip viz-mark viz-rise block w-[7px] rounded-t-[2px]"
+            style={{
+              height: p.value > 0 ? `${Math.max(12, (p.value / max) * 100)}%` : 2,
+              background: p.value === 0 ? TONE.track : last ? TONE.ink : TONE.soft,
+              ["--d" as string]: `${200 + i * 40}ms`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/** Ranked bars with the label on the left and the count at the tip (one series, one colour). */
+export function HBars({
+  rows,
+  unit,
+  label,
+}: {
+  rows: { key: string; label: string; value: number }[];
+  unit: [string, string];
+  label: string;
+}) {
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <ul aria-label={label} className="grid gap-2.5">
+      {rows.map((r, i) => (
+        <li key={r.key} className="grid grid-cols-[minmax(0,11rem)_1fr] items-center gap-x-4 text-[14px]">
+          <span className="truncate text-muted">{r.label}</span>
+          <span className="flex items-center gap-2.5">
+            <span
+              tabIndex={0}
+              data-tip={`${r.value} ${r.value === 1 ? unit[0] : unit[1]}`}
+              data-tip-align="start"
+              className="viz-tip viz-mark viz-reveal block h-3 rounded-r-[4px]"
+              style={{
+                width: `${(r.value / max) * 100}%`,
+                minWidth: r.value > 0 ? 4 : 0,
+                maxWidth: "calc(100% - 3ch)",
+                background: TONE.ink,
+                ["--d" as string]: `${120 + i * 60}ms`,
+              }}
+            />
+            <span className="text-[13px] font-medium">{r.value}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }

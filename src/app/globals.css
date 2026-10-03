@@ -366,3 +366,40 @@ a.link:hover,
     opacity: 0;
   }
 }
+
+/* Numbers that count up when the page opens, with no script: an animated integer
+   shown through a CSS counter. The real number sits beside it for screen readers.
+   Browsers without @property simply show the final number. */
+@property --num {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+.count-up {
+  counter-reset: num var(--num);
+}
+.count-up::after {
+  content: counter(num);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .count-up {
+    animation: count-up 1.2s cubic-bezier(0.22, 0.7, 0.2, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+  /* The page's one entrance: cards settle in, a few milliseconds apart. */
+  .rise-in {
+    animation: rise-in 0.55s cubic-bezier(0.22, 0.7, 0.2, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+}
+@keyframes count-up {
+  from {
+    --num: 0;
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

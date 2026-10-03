@@ -43,7 +43,11 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
         <Ring value={all.done} total={plan.tasks.length} size={96} label="Tasks done" />
         <div className="min-w-0">
           <p className="text-[17px]">
-            <span className="font-semibold">{all.done} of {plan.tasks.length} tasks done.</span>{" "}
+            <span className="font-semibold">
+              {all.done} of {plan.tasks.length} tasks done,{" "}
+              {plan.tasks.length > 0 ? Math.round(((plan.tasks.length - all.done) / plan.tasks.length) * 100) : 0}% still to
+              do.
+            </span>{" "}
             <span className="text-muted">
               {all.in_progress} in progress, {all.waiting} waiting, {all.not_started} not started.{" "}
               {daysToLaunch > 0 ? `${daysToLaunch} days to launch, ` : ""}
@@ -130,7 +134,10 @@ export default async function PlanPage({ params }: PageProps<"/w/[slug]/plan">) 
                 <span>{w.title}</span>
               </h2>
               <p className="text-sm text-muted">
-                {counts.done} of {tasks.length} done
+                <span className="font-semibold text-ink">
+                  {tasks.length > 0 ? Math.round((counts.done / tasks.length) * 100) : 0}% done
+                </span>
+                , {tasks.length - counts.done} of {tasks.length} left
               </p>
             </div>
             <div className="mt-3 max-w-[560px]">

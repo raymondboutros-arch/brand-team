@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/hq";
-import { Columns, TONE } from "@/components/viz";
+import { Columns, CountUp, TONE } from "@/components/viz";
 import { formatDay } from "@/lib/dates";
 import {
   ASSISTANTS,
@@ -48,7 +48,9 @@ export default async function VisibilityPage({ params }: PageProps<"/w/[slug]/vi
       <dl className="mt-8 grid gap-x-8 gap-y-6 border-y border-line py-6 sm:grid-cols-3">
         <div>
           <dt className="text-[13px] text-muted">Google clicks, last 13 weeks</dt>
-          <dd className="mt-1 text-[28px] font-semibold tracking-[-0.015em]">{n(quarterClicks)}</dd>
+          <dd className="mt-1 text-[28px] font-semibold tracking-[-0.015em]">
+            <CountUp value={quarterClicks} delay={100} />
+          </dd>
           <dd className="mt-1 text-[14px] text-muted">
             {quarterNonbrand} from searches without our name
           </dd>
@@ -56,7 +58,13 @@ export default async function VisibilityPage({ params }: PageProps<"/w/[slug]/vi
         <div>
           <dt className="text-[13px] text-muted">Buyer prompts where AI names us</dt>
           <dd className="mt-1 text-[28px] font-semibold tracking-[-0.015em]">
-            {v.latest ? `${namedPrompts.size} of 20` : "Not checked"}
+            {v.latest ? (
+              <>
+                <CountUp value={namedPrompts.size} delay={200} /> of 20
+              </>
+            ) : (
+              "Not checked"
+            )}
           </dd>
           <dd className="mt-1 text-[14px] text-muted">
             {v.latest

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/hq";
 import {
+  CLIENT_TYPE,
   PROFIT_RANGE,
   PROJECT_OPTIONS,
   SOURCE,
@@ -16,6 +17,7 @@ import {
 } from "@/lib/projects";
 import { todayInBeirut } from "@/lib/dates";
 import { ProjectForm } from "./project-form";
+import { HBars } from "@/components/viz";
 
 export const metadata: Metadata = { title: "Projects" };
 
@@ -63,6 +65,8 @@ export default async function ProjectsPage({ params, searchParams }: PageProps<"
         Every project from signed to closed: what they asked for, what they really needed, what we deliver, and
         the facts when it closes. Lost pitches stay here too, with the reason.
       </p>
+
+      <WhereFrom projects={projects} />
 
       {isOwner && money && <OwnerSummary projects={projects} money={money} />}
 
@@ -213,6 +217,46 @@ function OwnerSummary({ projects, money }: { projects: Project[]; money: Money }
             .join(", ")}.`}
         {` ${thisYear.length} ${thisYear.length === 1 ? "project" : "projects"} signed in ${year}.`}
       </p>
+    </section>
+  );
+}
+
+/** Where the client work came from and who it was for: won work only, our own ventures left out. */
+function WhereFrom({ projects }: { projects: Project[] }) {
+  const won = projects.filter((p) => p.status !== "lost" && p.client_type !== "own");
+  if (won.length < 3) return null;
+  const tally = (key: (p: Project) => string | null, labels: Record<string, string>) => {
+    const m = new Map<string, number>();
+    for (const p of won) {
+      const k = key(p) ?? "unknown";
+      m.set(k, (m.get(k) ?? 0) + 1);
+    }
+    return [...m.entries()]
+      .map(([k, v]) => ({ key: k, label: labels[k] ?? "Not recorded", value: v }))
+      .sort((a, b) => b.value - a.value);
+  };
+  const sources = tally((p) => p.source, SOURCE);
+  const types = tally((p) => p.client_type, CLIENT_TYPE);
+  const top = sources[0];
+  return (
+    <section aria-labelledby="from-h" className="mt-8 rounded-[20px] border border-line bg-card p-6 sm:p-7">
+      <h2 id="from-h" className="text-[17px] font-semibold">
+        Where the work came from
+      </h2>
+      <p className="mt-1 max-w-[70ch] text-[14px] text-muted">
+        {won.length} client projects, lost pitches and our own ventures left out.
+        {top ? ` Most came from ${top.label.toLowerCase()}: ${top.value} of ${won.length}.` : ""}
+      </p>
+      <div className="mt-6 grid gap-x-12 gap-y-8 md:grid-cols-2">
+        <div>
+          <h3 className="mb-3 text-[13px] font-medium text-muted">How they found us</h3>
+          <HBars rows={sources} unit={["project", "projects"]} label="Projects by how the client found us" />
+        </div>
+        <div>
+          <h3 className="mb-3 text-[13px] font-medium text-muted">Who they are</h3>
+          <HBars rows={types} unit={["project", "projects"]} label="Projects by type of client" />
+        </div>
+      </div>
     </section>
   );
 }
