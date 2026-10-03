@@ -46,6 +46,7 @@ export default async function WorkspaceLayout({ children, params }: LayoutProps<
             key={m.key}
             href={`${base}/${m.key}`}
             note={m.key === "actions" && waiting > 0 ? `${waiting} waiting` : undefined}
+            attention={m.key === "actions" && waiting > 0}
           >
             {m.label}
           </NavLink>

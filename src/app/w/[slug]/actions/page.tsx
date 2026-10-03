@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ACTION_STATE, StateTag } from "@/components/state-dot";
 import Link from "next/link";
 import { getWorkspace } from "@/lib/hq";
 import {
@@ -125,10 +126,15 @@ function ActionCard({
       <p className="font-serif text-[28px] italic leading-none">A{a.number}</p>
       <div className="mt-2 min-w-0 sm:mt-0">
         <h2 className="text-[17px] font-semibold leading-snug">{a.title}</h2>
-        <p className="mt-1 text-[13px] text-muted">
-          {AREA_LABEL[a.area]} ·{" "}
-          <span className={a.impact === "high" ? "font-medium text-ink" : ""}>{IMPACT_LABEL[a.impact]}</span> ·{" "}
-          {addedBy(a, names)}, {formatDay(dayInBeirut(a.created_at))}
+        <p className="mt-1.5 flex flex-wrap items-center gap-x-1 text-[13px] text-muted">
+          <StateTag state={ACTION_STATE[a.status]}>
+            <span className="text-ink">{ACTION_STATUS_LABEL[a.status]}</span>
+          </StateTag>
+          <span>
+            , {AREA_LABEL[a.area]},{" "}
+            <span className={a.impact === "high" ? "font-medium text-ink" : ""}>{IMPACT_LABEL[a.impact].toLowerCase()}</span>,{" "}
+            {addedBy(a, names).replace(/^(Added|Found)/, (m) => m.toLowerCase())}, {formatDay(dayInBeirut(a.created_at))}
+          </span>
         </p>
 
         <dl className="mt-4 grid gap-3 text-[15px] leading-relaxed">

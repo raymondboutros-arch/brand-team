@@ -535,3 +535,8 @@ a.link:hover,
     background-position: -120% 0;
   }
 }
+/* The palette's box is the whole panel; it needs no second ring. */
+.palette-input:focus,
+.palette-input:focus-visible {
+  outline: none;
+}

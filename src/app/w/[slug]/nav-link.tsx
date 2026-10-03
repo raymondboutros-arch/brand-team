@@ -8,11 +8,14 @@ export function NavLink({
   children,
   exact = false,
   note,
+  attention = false,
 }: {
   href: string;
   children: React.ReactNode;
   exact?: boolean;
   note?: string;
+  /** Something here waits on a person: the note gets a saffron dot. */
+  attention?: boolean;
 }) {
   const path = usePathname();
   const active = exact ? path === href : path === href || path.startsWith(href + "/");
@@ -29,7 +32,12 @@ export function NavLink({
       }`}
     >
       <span>{children}</span>
-      {note && <span className={`text-xs ${active ? "text-paper/70" : "text-paper/45"}`}>{note}</span>}
+      {note && (
+        <span className={`flex items-center gap-1.5 text-xs ${active ? "text-paper/70" : "text-paper/45"}`}>
+          {attention && <span aria-hidden className="size-1.5 rounded-full bg-saffron" />}
+          {note}
+        </span>
+      )}
     </Link>
   );
 }

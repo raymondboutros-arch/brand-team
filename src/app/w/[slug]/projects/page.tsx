@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PROJECT_STATE, StateTag } from "@/components/state-dot";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/hq";
@@ -155,7 +156,11 @@ function Row({ p, href, showStatus, profit }: { p: Project; href: string; showSt
       </td>
       <td className="px-4 py-3.5 text-muted">{p.year ?? ""}</td>
       <td className="px-4 py-3.5 text-right whitespace-nowrap">{usd(p.price_usd, { per: p.price_per })}</td>
-      {showStatus && <td className="px-4 py-3.5 text-muted">{STATUS_LABEL[p.status]}</td>}
+      {showStatus && (
+        <td className="px-4 py-3.5 text-muted">
+          <StateTag state={PROJECT_STATE[p.status]}>{STATUS_LABEL[p.status]}</StateTag>
+        </td>
+      )}
       {profit !== null && <td className="px-4 py-3.5 text-muted">{profit}</td>}
     </tr>
   );

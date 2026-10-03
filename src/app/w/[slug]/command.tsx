@@ -68,7 +68,7 @@ export function CommandPalette({ slug, pages }: { slug: string; pages: Page[] })
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    requestAnimationFrame(() => input.current?.focus());
+    input.current?.focus();
     return () => {
       document.body.style.overflow = prev;
     };
@@ -152,6 +152,7 @@ export function CommandPalette({ slug, pages }: { slug: string; pages: Page[] })
           </svg>
           <input
             ref={input}
+            autoFocus
             value={q}
             onChange={(e) => setQ(e.target.value)}
             role="combobox"
@@ -160,7 +161,7 @@ export function CommandPalette({ slug, pages }: { slug: string; pages: Page[] })
             aria-activedescendant={rows[active] ? `hq-row-${active}` : undefined}
             aria-autocomplete="list"
             placeholder="Search HQ, or jump to a page"
-            className="h-16 w-full bg-transparent text-[18px] text-ink placeholder:text-faint focus:outline-none"
+            className="palette-input h-16 w-full bg-transparent text-[18px] text-ink placeholder:text-faint"
           />
           {loading && <span aria-hidden className="palette-spinner size-4 shrink-0 rounded-full border-2 border-ink/15 border-t-ink/60" />}
           <kbd className="hidden shrink-0 rounded-md border border-ink/15 px-1.5 text-[11px] leading-5 text-muted sm:block">Esc</kbd>

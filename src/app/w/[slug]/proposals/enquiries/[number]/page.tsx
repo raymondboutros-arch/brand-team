@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PROPOSAL_STATE, StateTag } from "@/components/state-dot";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/hq";
@@ -88,7 +89,7 @@ export default async function EnquiryPage({ params }: PageProps<"/w/[slug]/propo
                       {p.title}
                     </Link>
                     <span className="mt-0.5 block text-[13px] text-muted">
-                      {PROPOSAL_STATUS_LABEL[p.status]}
+                      <StateTag state={PROPOSAL_STATE[p.status]}>{PROPOSAL_STATUS_LABEL[p.status]}</StateTag>
                       {p.sent_on ? `, sent ${formatDay(p.sent_on)}` : `, dated ${formatDay(p.issued_on)}`}
                       {project ? (
                         <>

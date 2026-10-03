@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PROPOSAL_STATE, StateDot } from "@/components/state-dot";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -101,6 +102,9 @@ export default async function ProposalPage({ params }: PageProps<"/w/[slug]/prop
       <section aria-label="Where it stands" className="mt-8 border-y border-line py-5">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
           <p className="text-[17px]">
+            <span className="mr-2 inline-flex translate-y-[-2px]">
+              <StateDot state={PROPOSAL_STATE[p.status]} />
+            </span>
             <span className="font-semibold">{PROPOSAL_STATUS_LABEL[p.status]}</span>
             <span className="text-muted">{statusLine(p, approverName, project.data?.number as number | undefined)}</span>
           </p>

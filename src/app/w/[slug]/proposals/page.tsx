@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PROPOSAL_STATE, StateDot } from "@/components/state-dot";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/hq";
@@ -166,6 +167,9 @@ function EnquiryRow({
       <td className="px-4 py-3.5">
         {latest ? (
           <>
+            <span className="mr-1.5 inline-flex translate-y-[-1px]">
+              <StateDot state={PROPOSAL_STATE[latest.status]} />
+            </span>
             <Link href={`${base}/${latest.number}`} className="link">
               Q{latest.number}
             </Link>
