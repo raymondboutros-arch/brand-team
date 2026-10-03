@@ -60,12 +60,17 @@ Proposals follow the same rule: Claude may draft `our_thinking` (marked `thinkin
 database refuses an approval that comes through Claude. Close a proposal with `select public.close_proposal(id,
 'won' | 'lost', said, think)` so the project is created with it.
 
+Visibility is filled through Claude until the connections land: a finished week of Search Console goes in
+`visibility_google` (week_of is a Monday; brand searches are those containing livbrid or creative couple), and an AI
+check is one `visibility_ai_runs` row with one `visibility_ai_answers` row per prompt, assistant and attempt.
+
 ## Build order (version 1)
 
 Done: setup and sign-in (30 Sep); Plan, Brand strategy, Scorecard and Reference, imported from
 the Claude docs on 1 Oct; Action queue (2 Oct, planned for 16 Oct); Projects with Owner-only money, hours and
 profit (2 Oct, planned for 30 Oct); Proposals with the price list, enquiries and the PDF (2 Oct, planned for
-6 Nov). Next: Channels (23 Oct) · Content (30 Oct) · Visibility, with Search Console and the Claude connector (13 Nov).
+6 Nov); Visibility with 13 weeks of Search Console and the AI baseline (3 Oct; the direct Search Console
+connection, Check now and the Claude connector stay on 13 Nov). Next: Channels (23 Oct) · Content (30 Oct).
 Prices live only in the database (`price_list`), never in a migration file: the repo may be public.
 Module list: `src/lib/modules.ts`.
 
